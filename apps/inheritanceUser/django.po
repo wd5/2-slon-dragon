@@ -1,0 +1,17 @@
+msgid "Users"
+msgstr "Пользователи"
+
+msgid "users"
+msgstr "пользователи"
+
+msgid "profile_addres"
+msgstr "адрес"
+
+msgid "profile_addreses"
+msgstr "адреса пользователя"
+
+msgid "discount_card"
+msgstr "номер"
+
+msgid "discount_cards"
+msgstr "Номера дисконтных карт"

@@ -1,0 +1,32 @@
+{% load siteblocks_extras %}
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta name="description" content="{% block META_description %}{{ meta.description }}{% endblock %}"/>
+    <meta name="keywords" content="{% block META_keywords %}{{ meta.keywords }}{% endblock %}"/>
+    <link href="/media/css/style.css" rel="stylesheet" type="text/css" />
+    <!--[if lte IE 8]><link rel="stylesheet" type="text/css" media="screen" href="/media/css/ie.css" /><![endif]-->
+    <script type="text/javascript" src="/media/js/jquery.js"></script>
+    <script type="text/javascript" src="/media/js/jquery.masonry.js"></script>
+    <script type="text/javascript" src="/media/js/jquery-ui-1.8.24.custom.min.js"></script>
+    <script type="text/javascript" src="/media/js/fancybox/jquery.fancybox-1.3.4.pack.js"></script>
+    <link rel="stylesheet" href="/media/js/fancybox/jquery.fancybox.css" type="text/css" media="screen" />
+    <script type="text/javascript" src="/media/js/jquery.jcarousel.min.js"></script>
+    <script type="text/javascript" src="/media/js/script.js"></script>
+    <title>
+        {% block title %}
+            {% if meta.title %}
+                {% ifnotequal meta.title ''  %}
+                    {{ meta.title }} &mdash;
+                {% endifnotequal %}
+            {% endif %}
+        {% endblock %}
+        {{ site_name }}
+    </title>
+</head>
+
+<body>
+{% block_footer_menu %}
+</body>
+</html>
