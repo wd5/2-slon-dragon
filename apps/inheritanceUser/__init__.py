@@ -1,3 +1,3 @@
 from django.utils.translation import ugettext_lazy as _
-_('users')
-_('Users')
+_('inheritanceuser')
+_('InheritanceUser')

@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+
+{% load thumbnail products_extras %}
+
+{% block title %}
+    &mdash;
+{% endblock %}
+
+{% block main %}
+    {% block_category_menu request.path %}
+
+    {{ user.email }}
+    {{ user.last_name }}
+    {{ user.first_name }}
+    {{ user.phone }}
+    {{ user.is_receive_mailer }}
+
+    <!-- для редактирования данных пользователя отправляй аяком на /cabinet/ POST такие переменные
+        first_name
+        last_name
+        email
+        phone
+        is_receive_mailer - передавай значение чекбоса через свойсво .prop("checked"), например
+         $('#is_receive_mailer').prop("checked")
+
+         возврат success - всё норм
+         возврат error - были ошибки
+    -->
+
+    <!-- история заказов -->
+    {% for order in orders %}
+        <div>
+            {{ order.id }}
+            {{ order.create_date }}
+            {{ order.get_str_total }}
+            {{ order.order_status }}
+            {{ order.get_products }}
+        </div>
+    {% endfor %}
+
+
+{% endblock %}
+

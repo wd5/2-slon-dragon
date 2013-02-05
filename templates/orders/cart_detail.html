@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+
+{% load thumbnail products_extras %}
+
+{% block title %}
+    &mdash;
+{% endblock %}
+
+{% block main %}
+    Корзина
+
+    <!-- для удаления товара, аяком POST на  /cart/delete_product_from_cart/ шлешь переменную
+     cart_product_id - айдишник CartProduct - продукта в корзине
+      в ответ success - значит всё норм
+
+      для изменения количества товара , на  /cart/change_cart_product_count/ шлешь переменные
+       cart_product_id - айдишник CartProduct - продукта в корзине
+       new_count - количество
+        в ответ success - значит всё норм
+
+      для восстановления товара в корзину, на  /cart/restore_product_to_cart/ шлешь переменную
+       cart_product_id - айдишник CartProduct - продукта в корзине
+        в ответ success - значит всё норм
+
+      -->
+
+    <div>
+        {{ cart_is_empty }}
+        {{ cart_id }}
+        {{ cart_str_total }}
+        <div>
+            {% for cart_product in cart_products %}
+                {{ cart_product.product.title }}
+                {{ cart_product.product.get_str_price }}
+                {{ cart_product.product.price }}
+                {{ cart_product.count }}
+                {{ cart_product.get_str_total }}
+            {% endfor %}
+        </div>
+    </div>
+
+    <a href="/cart/show_order_form/">Оформить заказ</a>
+
+{% endblock %}
+

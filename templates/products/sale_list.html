@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+
+{% load thumbnail products_extras %}
+
+{% block title %}
+     &mdash;
+{% endblock %}
+
+{% block main %}
+    {% block_category_menu request.path %}
+
+    Sale
+
+    {% for product in sale_products %}
+    <div>
+        <a href="{{ product.get_absolute_url }}">{{ product.title }}</a>
+        {{ product.get_str_price }}
+        {{ product.image }}
+        {{ product.is_new }}
+        {{ product.sale_value }}
+    </div>
+    {% endfor %}
+
+{% endblock %}
+

@@ -96,10 +96,10 @@ msgid "question_categories"
 msgstr "категории вопросов"
 
 #: apps/inheritanceUser/
-msgid "Users"
+msgid "InheritanceUser"
 msgstr "Пользователи"
 
-msgid "users"
+msgid "inheritanceuser"
 msgstr "пользователи"
 
 msgid "profile_addres"
@@ -135,6 +135,25 @@ msgstr "категории новостей"
 msgid "news_category"
 msgstr "категория"
 
+#
+
+msgid "Orders"
+msgstr "Заказы"
+
+msgid "orders"
+msgstr "заказы"
+
+msgid "cart"
+msgstr "корзина"
+
+msgid "carts"
+msgstr "корзина"
+
+msgid "order_item"
+msgstr "заказ"
+
+msgid "order_items"
+msgstr "заказы"
 
 #: apps/pages/
 msgid "Pages"

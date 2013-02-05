@@ -1,0 +1,35 @@
+{% if is_empty %}
+    {% if type == 'short' %}
+        <div class="cart_short">
+            Корзина Пока пуста
+        </div>
+    {% else %}
+        <div class="cart_drop">
+            Корзина Пока пуста
+        </div>
+    {% endif %}
+{% else %}
+    {% if type == 'short' %}
+        <div class="cart_short">
+            {{ cart_products_count }} {{ cart_products_text }} на {{ cart_total }} руб.
+        </div>
+    {% else %}
+        <div class="cart_drop">
+            {% for cart_product in cart.get_products %}
+                <div>
+                    {{ cart_product.product.title }}
+                    {{ cart_product.product.get_absolute_url }}
+                    {{ cart_product.count }}
+                    {{ cart_product.get_str_total }}
+                </div>
+            {% endfor %}
+            Итого: {{ cart_total }} руб.
+            <a href="/cart/">В корзину</a>
+            <a href="/cart/show_order_form/">Оформить</a>
+        </div><!--/cartbox-->
+    {% endif %}
+{% endif %}
+
+
+
+

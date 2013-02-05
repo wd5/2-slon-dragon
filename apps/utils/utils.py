@@ -10,7 +10,7 @@ from decimal import Decimal
 import xhtml2pdf.pisa as pisa
 import settings
 
-def moneyfmt(value, places=0, curr='', sep=' ', dp='.',
+def moneyfmt(value, places=2, curr='', sep=' ', dp='.',
              pos='', neg='-', trailneg=''):
     """Convert Decimal to a money formatted string.
 
@@ -57,12 +57,20 @@ def moneyfmt(value, places=0, curr='', sep=' ', dp='.',
             build(sep)
     build(curr)
     build(neg if sign else pos)
-    return ''.join(reversed(result))
-
+    result = ''.join(reversed(result))
+    try:
+        if result.split(dp)[1] == u'00':
+            return result.split(dp)[0]
+        else:
+            return result
+    except:
+        return result
 
 def random_key(length=6, allowed_chars='abcdefghjkmnpqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ23456789'):
     from random import choice
+
     return ''.join([choice(allowed_chars) for i in range(length)])
+
 
 def send_order_email(subject, html_content, email_list, file):
     current_site = Site.objects.get_current()
@@ -76,8 +84,10 @@ def send_order_email(subject, html_content, email_list, file):
         msg.attach_file(file, mimetype="application/pdf")
         msg.send()
 
+
 def render_to_pdf(template_src, id_guest, context_dict):
     from cStringIO import StringIO
+
     response = HttpResponse(mimetype='application/pdf')
     response['Content-Disposition'] = 'attachment; filename=somefilename.pdf'
     template = get_template(template_src)
@@ -97,8 +107,8 @@ def render_to_pdf(template_src, id_guest, context_dict):
 
 
 def send_emails(m, file):
-    admin_email = Settings.objects.get(name = 'email_notification').value
-    email_list = [u'%s' % admin_email,]
+    admin_email = Settings.objects.get(name='email_notification').value
+    email_list = [u'%s' % admin_email, ]
     subject = u'Новый зарегистрированный гость'
     html_content = u'''
         <p style="font-size: 12px;">Здравствуйте.<br /><br />Новый зарегистрированный гость.</p>
@@ -109,12 +119,12 @@ def send_emails(m, file):
         <b>E-mail:</b> %s<br />
         <b>Телефон:</b> %s<br />
         <b>Уникальный ключ:</b> %s</p>
-        <p><a href="http://3dxopen.ru/admin/members/guests/%s/">перейти к просмотру</a></p>''' % \
-           (m.id, m.name, m.email, m.phone, m.key, m.id)
+        <p><a href="http://3dxopen.ru/admin/members/guests/%s/">перейти к просмотру</a></p>''' %\
+                   (m.id, m.name, m.email, m.phone, m.key, m.id)
 
     send_order_email(subject, html_content, email_list, file)
 
-    email_list = [u'%s' % m.email,]
+    email_list = [u'%s' % m.email, ]
     subject = u'Приглашение на 3DX Moscow Open'
     html_content = u'''
         <p style="font-size: 12px;">Здравствуйте.<br /><br />Пропуск успешно выписан(см. прикрепления).</p>
@@ -123,14 +133,15 @@ def send_emails(m, file):
         <b>Номер п/п:</b> %s<br />
         <b>ФИО:</b> %s<br />
         <b>E-mail:</b> %s<br />
-        <b>Телефон:</b> %s<br /></p>''' % \
-           (m.id, m.name, m.email, m.phone)
+        <b>Телефон:</b> %s<br /></p>''' %\
+                   (m.id, m.name, m.email, m.phone)
 
     send_order_email(subject, html_content, email_list, file)
 
 
 def crop_image(post, original_img, output_size):
     import settings
+
     try:
         from PIL import Image
     except ImportError:
@@ -149,13 +160,13 @@ def crop_image(post, original_img, output_size):
     image = Image.open(name)
     m_width = float(output_size[0])
     m_height = float(output_size[1])
-    w_k = image.size[0]/m_width
-    h_k = image.size[1]/m_height
+    w_k = image.size[0] / m_width
+    h_k = image.size[1] / m_height
     if output_size < image.size:
         if w_k > h_k:
-            new_size = (int(m_width), int(image.size[1]/w_k))
+            new_size = (int(m_width), int(image.size[1] / w_k))
         else:
-            new_size = (int(image.size[0]/h_k), int(m_height))
+            new_size = (int(image.size[0] / h_k), int(m_height))
     else:
         new_size = image.size
     image = image.resize(new_size, Image.ANTIALIAS)

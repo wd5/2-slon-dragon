@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from decimal import Decimal
 from django.contrib.auth.models import User
 from django.core.context_processors import csrf
 from django.core.mail.message import EmailMessage
@@ -8,14 +9,16 @@ from django.template.loader import render_to_string
 from django.views.decorators.csrf import csrf_exempt, csrf_protect
 from django.views.generic import FormView, TemplateView, View
 from django.views.generic.detail import DetailView
-from apps.orders.models import Cart, CartProduct, OrderProduct, Order
+from apps.orders.models import Cart, CartProduct, OrderProduct, Order, EmsCity
 from apps.orders.forms import RegistrationOrderForm
 from apps.products.models import Product
 from apps.inheritanceUser.models import CustomUser
 from apps.inheritanceUser.forms import RegistrationForm, AddressForm
 from apps.siteblocks.models import Settings
+from apps.siteblocks.context_processors import settings as settings_context_proc
+from context_processors import order_context_proc
 from pytils.numeral import choose_plural
-import settings
+import settings, urllib, json
 
 # для кабинета - История заказов
 class ShowOrderInfo(DetailView):
@@ -59,8 +62,8 @@ class ViewCart(TemplateView):
         cookies = self.request.COOKIES
 
         cookies_cart_id = False
-        if 'cart_id' in cookies:
-            cookies_cart_id = cookies['cart_id']
+        if 'slondragon_cart_id' in cookies:
+            cookies_cart_id = cookies['slondragon_cart_id']
 
         if self.request.user.is_authenticated and self.request.user.id:
             profile_id = self.request.user.id
@@ -85,14 +88,14 @@ class ViewCart(TemplateView):
         if cart:
             cart_products = cart.get_products_all()
         else:
-            cart_products = False
+            cart_products = []
 
         cart_str_total = u''
         if cart_products:
             is_empty = False
             cart_str_total = cart.get_str_total()
 
-        context['is_empty'] = is_empty
+        context['cart_is_empty'] = is_empty
         context['cart_products'] = cart_products
         context['cart_str_total'] = cart_str_total
         context['cart_id'] = cart_id
@@ -105,21 +108,11 @@ class OrderFromView(FormView):
     template_name = 'orders/order_form.html'
 
     def post(self, request, *args, **kwargs):
-        try:
-            phonenum = Settings.objects.get(name='phonenum').value
-        except Settings.DoesNotExist:
-            phonenum = False
-
-        try:
-            selfcarting_text = Settings.objects.get(name='selfcarting')
-        except:
-            selfcarting_text = False
-
         response = HttpResponse()
         cookies = self.request.COOKIES
         cookies_cart_id = False
-        if 'cart_id' in cookies:
-            cookies_cart_id = cookies['cart_id']
+        if 'slondragon_cart_id' in cookies:
+            cookies_cart_id = cookies['slondragon_cart_id']
 
         if self.request.user.is_authenticated and self.request.user.id:
             profile_id = self.request.user.id
@@ -129,7 +122,6 @@ class OrderFromView(FormView):
         if profile_id:
             try:
                 profile = CustomUser.objects.get(pk=int(profile_id))
-                addresses = profile.get_addresses()
             except:
                 profile = False
         else:
@@ -160,6 +152,11 @@ class OrderFromView(FormView):
         order_form = RegistrationOrderForm(data)
         if order_form.is_valid():
             new_order = order_form.save()
+            try:
+                new_order.total_price += Decimal(request.POST['delivery_price'])
+                new_order.save()
+            except:
+                pass
 
             for cart_product in cart_products:
                 ord_prod = OrderProduct(
@@ -176,9 +173,9 @@ class OrderFromView(FormView):
                 profile.save()
 
             cart.delete() #Очистка и удаление корзины
-            response.delete_cookie('cart_id') # todo: ???
+            response.delete_cookie('slondragon_cart_id') # todo: ???
 
-            subject = u'BeautyHome - Информация по заказу.'
+            subject = u'Слон-Дракон - Информация по заказу.'
             subject = u''.join(subject.splitlines())
             message = render_to_string(
                 'orders/message_template.html',
@@ -203,15 +200,18 @@ class OrderFromView(FormView):
             else:
                 reg_form = False
 
-            c = {'order': new_order, 'request': request, 'user': request.user,
-                 'reg_form': reg_form, 'phonenum': phonenum, }
-            c.update(csrf(request))
-            return render_to_response('orders/order_form_final.html', c)
+            context = {'order': new_order, 'request': request, 'user': request.user, 'reg_form': reg_form}
+            context.update(csrf(request))
+            context.update(order_context_proc(request))
+            context.update(settings_context_proc(request))
+            return render_to_response('orders/order_form_final.html', context)
         else:
-            c = {'order_form': order_form, 'request': request, 'user': request.user, 'cart_total': cart.get_str_total(),
-                 'selfcarting_text': selfcarting_text, 'phonenum': phonenum, 'addresses': addresses}
-            c.update(csrf(request))
-            return render_to_response(self.template_name, c)
+            context = {'order_form': order_form, 'request': request, 'user': request.user,
+                       'cart_total': cart.get_str_total()}
+            context.update(csrf(request))
+            context.update(order_context_proc(request))
+            context.update(settings_context_proc(request))
+            return render_to_response(self.template_name, context)
 
     def get(self, request, *args, **kwargs):
         form_class = self.get_form_class()
@@ -220,8 +220,8 @@ class OrderFromView(FormView):
 
         cookies = self.request.COOKIES
         cookies_cart_id = False
-        if 'cart_id' in cookies:
-            cookies_cart_id = cookies['cart_id']
+        if 'slondragon_cart_id' in cookies:
+            cookies_cart_id = cookies['slondragon_cart_id']
 
         if self.request.user.is_authenticated and self.request.user.id:
             profile_id = self.request.user.id
@@ -241,52 +241,139 @@ class OrderFromView(FormView):
             except:
                 cart = False
         if cart:
-            cart_total = cart.get_str_total()
-            context['cart_total'] = cart_total
-
-            context['order_form'] = form
+            cart_total = cart.get_total()
+            cart_total_str = cart.get_str_total()
+            context['cart_total'] = cart_total_str
 
             if self.request.user.is_authenticated and self.request.user.id:
                 try:
                     profile_set = CustomUser.objects.filter(id=self.request.user.id)
                     profile = CustomUser.objects.get(id=self.request.user.id)
-                    context['addresses'] = profile.get_addresses()
-                    context['order_form'].fields['profile'].queryset = profile_set
-                    context['order_form'].fields['profile'].initial = profile
-                    context['order_form'].fields['first_name'].initial = self.request.user.first_name
-                    context['order_form'].fields['last_name'].initial = self.request.user.last_name
-                    context['order_form'].fields['email'].initial = self.request.user.email
-                    context['order_form'].fields['phone'].initial = profile.phone
-                    context['order_form'].fields['order_carting'].initial = u'carting'
-                    context['order_form'].fields['order_status'].initial = u'processed'
-                    context['order_form'].fields['total_price'].initial = cart_total
-
-                    user_set = User.objects.filter(id=profile.id)
-                    context['addresses_form'] = AddressForm(initial={'user': profile})
-                    context['addresses_form'].fields['user'].queryset = user_set
+                    form.fields['profile'].queryset = profile_set
+                    form.fields['profile'].initial = profile
+                    form.fields['first_name'].initial = self.request.user.first_name
+                    form.fields['last_name'].initial = self.request.user.last_name
+                    form.fields['email'].initial = self.request.user.email
+                    form.fields['phone'].initial = profile.phone
+                    form.fields['order_carting'].initial = u'country'
+                    form.fields['order_payment'].initial = u'cash_on_delivery'
+                    form.fields['order_status'].initial = u'processed'
+                    try:
+                        address = profile.get_addresses()[:1].get()
+                        form.fields['index'].initial = address.index
+                        form.fields['city'].initial = address.city
+                        form.fields['street'].initial = address.street
+                        form.fields['house_no'].initial = address.house_no
+                        form.fields['apartment'].initial = address.apartment
+                        form.fields['note'].initial = address.note
+                    except:
+                        pass
+                    form.fields['total_price'].initial = cart_total
                 except CustomUser.DoesNotExist:
                     return HttpResponseBadRequest()
             else:
-                context['order_form'].fields['profile'].queryset = CustomUser.objects.extra(where=['1=0'])
-                context['order_form'].fields['order_carting'].initial = u'carting'
-                context['order_form'].fields['order_status'].initial = u'processed'
-                context['order_form'].fields['total_price'].initial = cart_total
+                form.fields['profile'].queryset = CustomUser.objects.extra(where=['1=0'])
+                form.fields['order_carting'].initial = u'country'
+                form.fields['order_payment'].initial = u'cash_on_delivery'
+                form.fields['order_status'].initial = u'processed'
+                form.fields['total_price'].initial = cart_total
+
+            context['order_form'] = form
         else:
-            return HttpResponseBadRequest()
+            return HttpResponseRedirect('/')
+        context.update(csrf(request))
+        context.update(order_context_proc(request))
+        context.update(settings_context_proc(request))
         return self.render_to_response(context)
-
-    def get_context_data(self, **kwargs):
-        context = super(OrderFromView, self).get_context_data()
-        try:
-            context['selfcarting_text'] = Settings.objects.get(name='selfcarting')
-        except:
-            context['selfcarting_text'] = False
-
-        return context
 
 show_order_form = csrf_protect(OrderFromView.as_view())
 
 show_finish_form = csrf_protect(OrderFromView.as_view())
+
+# AJAX
+
+class RefreshCartView(View):
+    def post(self, request, *args, **kwargs):
+        if not request.is_ajax():
+            return HttpResponseBadRequest()
+        else:
+            try:
+                cart_type = request.POST['type']
+            except:
+                return HttpResponseBadRequest()
+
+            cookies = request.COOKIES
+            response = HttpResponse()
+
+            cookies_cart_id = False
+            if 'slondragon_cart_id' in cookies:
+                cookies_cart_id = cookies['slondragon_cart_id']
+
+            if request.user.is_authenticated and request.user.id:
+                profile_id = request.user.id
+            else:
+                profile_id = False
+
+            sessionid = request.session.session_key
+
+            if profile_id:
+                try:
+                    cart = Cart.objects.get(profile=profile_id)
+                except Cart.DoesNotExist:
+                    if cookies_cart_id:
+                        try:
+                            cart = Cart.objects.get(id=cookies_cart_id)
+                            if cart.profile:
+                                cart = False
+                            else:
+                                try:
+                                    profile = CustomUser.objects.get(pk=int(profile_id))
+                                except:
+                                    profile = False
+                                if profile:
+                                    cart.profile = profile
+                                    cart.save()
+                        except:
+                            cart = False
+                    else:
+                        cart = False
+            elif cookies_cart_id:
+                try:
+                    cart = Cart.objects.get(id=cookies_cart_id)
+                except Cart.DoesNotExist:
+                    cart = False
+            else:
+                try:
+                    cart = Cart.objects.get(sessionid=sessionid)
+                except Cart.DoesNotExist:
+                    cart = False
+
+            is_empty = True
+            cart_total = 0
+            cart_products_count = 0
+            cart_products_text = u''
+            if cart:
+                cart_products_count = cart.get_products_count()
+                if cart_products_count:
+                    cart_total = cart.get_str_total()
+                    is_empty = False
+                    cart_products_text = u'товар%s' % (choose_plural(cart_products_count, (u'', u'а', u'ов')))
+
+            cart_html = render_to_string(
+                'orders/block_cart.html',
+                    {
+                    'is_empty': is_empty,
+                    'type': cart_type,
+                    'cart': cart,
+                    'cart_products_count': cart_products_count,
+                    'cart_total': cart_total,
+                    'cart_products_text': cart_products_text,
+                    }
+            )
+            response.content = cart_html
+            return response
+
+refresh_cart = csrf_exempt(RefreshCartView.as_view())
 
 class AddProductToCartView(View):
     def post(self, request, *args, **kwargs):
@@ -295,24 +382,18 @@ class AddProductToCartView(View):
         else:
             if 'product_id' not in request.POST:
                 return HttpResponseBadRequest()
-            else:
-                product_id = request.POST['product_id']
-                try:
-                    product_id = int(product_id)
-                except ValueError:
-                    return HttpResponseBadRequest()
 
             try:
-                product = Product.objects.get(id=product_id)
-            except Product.DoesNotExist:
+                product = Product.objects.get(id=int(request.POST['product_id']))
+            except:
                 return HttpResponseBadRequest()
 
             cookies = request.COOKIES
             response = HttpResponse()
 
             cookies_cart_id = False
-            if 'cart_id' in cookies:
-                cookies_cart_id = cookies['cart_id']
+            if 'slondragon_cart_id' in cookies:
+                cookies_cart_id = cookies['slondragon_cart_id']
 
             if request.user.is_authenticated and request.user.id:
                 profile_id = request.user.id
@@ -351,20 +432,20 @@ class AddProductToCartView(View):
                                 return HttpResponseBadRequest()
                     else:
                         cart = Cart.objects.create(profile=profile)
-                response.set_cookie('cart_id', cart.id, 1209600)
+                response.set_cookie('slondragon_cart_id', cart.id, 1209600)
                 #if cookies_cart_id: response.delete_cookie('cart_id')
             elif cookies_cart_id:
                 try:
                     cart = Cart.objects.get(id=cookies_cart_id)
                 except Cart.DoesNotExist:
                     cart = Cart.objects.create(sessionid=sessionid)
-                response.set_cookie('cart_id', cart.id, 1209600)
+                response.set_cookie('slondragon_cart_id', cart.id, 1209600)
             else:
                 try:
                     cart = Cart.objects.get(sessionid=sessionid)
                 except Cart.DoesNotExist:
                     cart = Cart.objects.create(sessionid=sessionid)
-                response.set_cookie('cart_id', cart.id, 1209600)
+                response.set_cookie('slondragon_cart_id', cart.id, 1209600)
             try:
                 cart_product = CartProduct.objects.get(
                     cart=cart,
@@ -380,27 +461,7 @@ class AddProductToCartView(View):
                     cart=cart,
                     product=product,
                 )
-
-            is_empty = True
-            cart_products_count = cart.get_products_count()
-            cart_total = cart.get_str_total()
-            cart_products_text = u''
-            if cart_products_count:
-                is_empty = False
-                cart_products_text = u'товар%s' % (choose_plural(cart_products_count, (u'', u'а', u'ов')))
-
-            cart_html = render_to_string(
-                'orders/block_cart.html',
-                    {
-                    'is_empty': is_empty,
-                    'profile_id': profile_id,
-                    'cart_products_count': cart_products_count,
-                    'cart_total': cart_total,
-                    'cart_products_text': cart_products_text
-                }
-            )
-            response.content = cart_html
-            return response
+            return HttpResponse('sucess')
 
 add_product_to_cart = csrf_exempt(AddProductToCartView.as_view())
 
@@ -411,32 +472,15 @@ class DeleteProductFromCart(View):
         else:
             if 'cart_product_id' not in request.POST:
                 return HttpResponseBadRequest()
-            else:
-                cart_product_id = request.POST['cart_product_id']
-                try:
-                    cart_product_id = int(cart_product_id)
-                except ValueError:
-                    return HttpResponseBadRequest()
 
             try:
-                cart_product = CartProduct.objects.get(id=cart_product_id)
+                cart_product = CartProduct.objects.get(id=int(request.POST['cart_product_id']))
             except CartProduct.DoesNotExist:
                 return HttpResponseBadRequest()
 
             cart_product.is_deleted = True
             cart_product.save()
-
-            response = HttpResponse()
-
-            cart_products_count = cart_product.cart.get_products_count()
-            cart_total = u''
-            if cart_products_count:
-                cart_total = cart_product.cart.get_str_total()
-            else:
-                cart_total = u'0'
-            data = u'''{"cart_total":'%s',"cart_product_id":'%s'}''' % (cart_total, cart_product_id)
-            response.content = data
-            return response
+            return HttpResponse('success')
 
 delete_product_from_cart = csrf_exempt(DeleteProductFromCart.as_view())
 
@@ -461,16 +505,7 @@ class RestoreProductToCart(View):
 
             cart_product.is_deleted = False
             cart_product.save()
-
-            response = HttpResponse()
-
-            cart_products_count = cart_product.cart.get_products_count()
-            cart_total = u''
-            if cart_products_count:
-                cart_total = cart_product.cart.get_str_total()
-            data = u'''{"cart_total":'%s'}''' % cart_total
-            response.content = data
-            return response
+            return HttpResponse('success')
 
 restore_product_to_cart = csrf_exempt(RestoreProductToCart.as_view())
 
@@ -501,11 +536,60 @@ class ChangeCartCountView(View):
 
             cart_product.count = new_count
             cart_product.save()
-            cart_str_total = cart_product.cart.get_str_total()
-
-            data = u'''{"tr_str_total":'%s', "cart_str_total":'%s'}''' % (cart_product.get_str_total(), cart_str_total)
-
-            return HttpResponse(data)
+            return HttpResponse('success')
 
 change_cart_product_count = csrf_exempt(ChangeCartCountView.as_view())
 
+class EmsCalculateView(View):
+    def post(self, request, *args, **kwargs):
+        if not request.is_ajax():
+            return HttpResponseRedirect('/')
+        else:
+            if 'city' not in request.POST:
+                return HttpResponseBadRequest()
+
+            city = request.POST['city']
+
+            if city == '':
+                return HttpResponseBadRequest()
+
+            cookies = request.COOKIES
+            cookies_cart_id = False
+            if 'shoes_cart_id' in cookies:
+                cookies_cart_id = cookies['shoes_cart_id']
+
+            if self.request.user.is_authenticated and self.request.user.id:
+                profile_id = self.request.user.profile.id
+            else:
+                profile_id = False
+
+            sessionid = self.request.session.session_key
+
+            try:
+                if profile_id:
+                    cart = Cart.objects.get(profile=profile_id)
+                elif cookies_cart_id:
+                    cart = Cart.objects.get(id=cookies_cart_id)
+                else:
+                    cart = Cart.objects.get(sessionid=sessionid)
+            except Cart.DoesNotExist:
+                cart = False
+
+            if cart:
+                try:
+                    ems_city = EmsCity.objects.get(name__iexact=city)
+                except:
+                    ems_city = False
+                if ems_city:
+                    city_code = ems_city.value # из москвы!
+                    carting_price_data = urllib.urlopen(
+                        'http://emspost.ru/api/rest?method=ems.calculate&from=city--moskva&to=%s&weight=%s' % (
+                            city_code, cart.get_products_count()))
+                    json_data = json.load(carting_price_data)
+                    return HttpResponse(json_data["rsp"]["price"])
+                else: # не нашли город
+                    return HttpResponse('NotFound')
+            else:
+                return HttpResponseBadRequest()
+
+ems_calculate = csrf_exempt(EmsCalculateView.as_view())

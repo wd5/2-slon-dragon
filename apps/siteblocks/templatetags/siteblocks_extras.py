@@ -7,12 +7,6 @@ from apps.utils.utils import moneyfmt
 
 register = template.Library()
 
-@register.inclusion_tag("siteblocks/block_footer_menu.html")
-def block_footer_menu():
-    menu = Category.objects.filter(is_footer_menu=True)
-    return {'menu': menu}
-
-
 @register.filter
 def money_fmt(value):
     value = Decimal(value)

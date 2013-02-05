@@ -1,7 +1,7 @@
-msgid "Users"
+msgid "InheritanceUser"
 msgstr "Пользователи"
 
-msgid "users"
+msgid "inheritanceuser"
 msgstr "пользователи"
 
 msgid "profile_addres"

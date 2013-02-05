@@ -52,7 +52,7 @@ class Redactor(forms.Textarea):
         js = (
             '/media/js/jquery.js',
             '/media/js/redactor/langs/ru.js',
-            '/media/js/redactor/redactor.min.js',
+            '/media/js/redactor/redactor.js',
             )
         css = {
             'all': ('/media/js/redactor/redactor.css',)

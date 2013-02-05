@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+
+{% load thumbnail products_extras %}
+
+{% block title %}
+    {{ product.title }} &mdash;
+{% endblock %}
+
+{% block main %}
+
+    {% block_category_menu request.path %}
+
+    {{ product.category.get_bread_product|upper|safe }}
+    {{ product.title }}
+    {{ product.art }}
+    {{ product.image }}
+    {{ product.get_str_price }}
+    {{ product.description|safe }}
+    {% if product.video_code %}
+        <a class="fancybox-media" href="{{ product.video_code }}">Видео</a>
+    {% endif %}
+
+    {% for photo in product.get_photos %}
+        {{ photo.image }}
+    {% endfor %}
+
+    <!-- для добавления товара в корзину, аяком POST на /cart/add_product_to_cart/ шлешь переменную
+     product_id - айдишник продукта
+      в ответ success - значит всё норм
+
+      предлагаю тебе написать JSфункцию которая будет аяком рефрешить блок корзины, потому что рефрешить нужно часто:
+      при добавлении, удалении товара, изменении количества. По этому чтобы везде дублировать код рендеринга блока корзины
+      - лучше функцию в js. Сейчас сделаю урл /cart/refresh_cart/. В функции аяком на него стучись и в data тебе будет приходить html код
+      блока корзины.
+      Но так как у нас 2 места где выводится корзина (это строка в шапке и блок-выпадашка), то передавай туда переменную
+      type со значением 'short' или 'drop' соответственно. И тебе будет соответствующий html приходить для обновления.
+      -->
+
+    <!-- харакетристики товара -->
+    {% for feature_value in product.get_feature_values %}
+        <div>
+            {{ feature_value.feature_name.title }} -
+            {{ feature_value.value }}
+        </div>
+    {% endfor %}
+
+    <!-- похожие товары -->
+    {% for product in product.get_related_products %}
+    <div>
+        <a href="{{ product.get_absolute_url }}">{{ product.title }}</a>
+        {{ product.get_str_price }}
+        {{ product.image }}
+        {{ product.is_new }}
+        {{ product.sale_value }}
+    </div>
+    {% endfor %}
+
+{% endblock %}
+

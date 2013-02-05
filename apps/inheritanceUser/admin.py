@@ -17,7 +17,7 @@ class CustomUserAdmin(UserAdmin):
     form = UserChangeForm
     fieldsets = (
             (None, {'fields': ('username', 'password')}),
-            (_('Personal info'), {'fields': ('email', 'last_name','first_name','third_name', 'sex', 'b_day', 'phone')}),
+            (_('Personal info'), {'fields': ('email', 'last_name','first_name', 'phone', 'discount_card_number', 'is_receive_mailer')}),
             (_('Permissions'), {'fields': ('is_active', 'is_staff', 'is_superuser', 'user_permissions')}),
             (_('Important dates'), {'fields': ('last_login', 'date_joined')}),
             (_('Groups'), {'fields': ('groups',)}),
@@ -26,7 +26,7 @@ class CustomUserAdmin(UserAdmin):
     list_display_links = ('id', 'username', )
     list_filter = ('is_staff','is_superuser', 'is_active')
     search_fields = ('username', 'last_name','first_name','third_name', 'email',)
-    #inlines = [AddressInlines,]
+    inlines = [AddressInlines,]
 
 admin.site.register(CustomUser, CustomUserAdmin)
 

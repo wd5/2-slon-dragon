@@ -1,23 +1,35 @@
 {% extends "base.html" %}
 
-{% load thumbnail %}
+{% load thumbnail products_extras %}
 
-{% if page.title %}
-    {% block title %}
-        {{ page.title }} &mdash;
-    {% endblock %}
-{% endif %}
+{% block title %}
+    Главная &mdash;
+{% endblock %}
 
-{% block center %}
-    <div class="text text_page">
-        {% if page.image %}
-            <p>
-                {% thumbnail page.image "374x252" as  small %}
-                    <img src="{{ small.url }}" width="{{ small.x }}" height="{{ small.y }}" alt="" />
-                {% endthumbnail %}
-            </p>
-        {% endif %}
-        {{ page.content|safe }}
+{% block main %}
+    {% block_category_menu request.path %}
+
+    <!-- СЛОН-ДРАКОН РЕКОМЕНДУЕТ -->
+    {% for product in recomended_products %}
+    <div>
+        <a href="{{ product.get_absolute_url }}">{{ product.title }}</a>
+        {{ product.get_str_price }}
+        {{ product.image }}
+        {{ product.is_new }}
+        {{ product.sale_value }}
     </div>
+    {% endfor %}
+
+    <!-- НЕДАВНО КУПИЛИ -->
+    {% for product in recently_buyed_products %}
+    <div>
+        <a href="{{ product.get_absolute_url }}">{{ product.title }}</a>
+        {{ product.get_str_price }}
+        {{ product.image }}
+        {{ product.is_new }}
+        {{ product.sale_value }}
+    </div>
+    {% endfor %}
+
 {% endblock %}
 

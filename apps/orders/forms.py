@@ -19,8 +19,9 @@ class RegistrationOrderForm(forms.ModelForm):
         house_no = cleaned_data.get("house_no")
         street = cleaned_data.get("street")
         index = cleaned_data.get("index")
+        city = cleaned_data.get("city")
 
-        if order_carting == 'country' and (street=='' and index=='' and house_no=='' and apartment==''):
+        if order_carting == 'country' and (street=='' or index=='' or house_no=='' or apartment=='' or city==''):
             raise forms.ValidationError("Обязательное поле.")
 
         return cleaned_data

@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 from django.contrib import admin
-from apps.orders.models import  CartProduct,Order,OrderProduct
+from apps.orders.models import  CartProduct,Order,OrderProduct, Cart
 
 class CartProductInlines(admin.TabularInline):
     model = CartProduct
-    readonly_fields = ('product',)
+    #readonly_fields = ('product',)
     extra = 0
 
 class CartAdmin(admin.ModelAdmin):
@@ -15,7 +15,7 @@ class CartAdmin(admin.ModelAdmin):
 
 class OrderProductInlines(admin.TabularInline):
     model = OrderProduct
-    readonly_fields = ('product','count',)
+    #readonly_fields = ('product','count',)
     extra = 0
 
 class OrderAdmin(admin.ModelAdmin):

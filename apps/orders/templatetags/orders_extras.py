@@ -7,7 +7,7 @@ from pytils.numeral import choose_plural
 register = template.Library()
 
 @register.inclusion_tag("orders/block_cart.html", takes_context=True)
-def block_cart(context):
+def block_cart(context, type):
     if 'request' in context:
         request = context['request']
         user = request.user
@@ -15,8 +15,8 @@ def block_cart(context):
         cookies = request.COOKIES
 
         cookies_cart_id = False
-        if 'cart_id' in cookies:
-            cookies_cart_id = cookies['cart_id']
+        if 'slondragon_cart_id' in cookies:
+            cookies_cart_id = cookies['slondragon_cart_id']
 
         if request.user.is_authenticated and request.user.id:
             profile_id = request.user.id
@@ -72,7 +72,9 @@ def block_cart(context):
             cart_products_text = u'товар%s' % (choose_plural(cart_products_count, (u'', u'а', u'ов')))
     return {
         'is_empty': is_empty,
+        'type': type,
         'user': user,
+        'cart': cart,
         'cart_products_count': cart_products_count,
         'cart_total': cart_total,
         'cart_products_text': cart_products_text,

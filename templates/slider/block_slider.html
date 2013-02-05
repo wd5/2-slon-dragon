@@ -1,0 +1,8 @@
+{% for slide in slider_items %}
+    <div class="slide">
+        {{ slide.title_addition }}
+        {{ slide.url }}
+        {{ slide.title }}
+        <img src="{{ slide.get_image }}" alt="" />
+    </div>
+{% endfor %}

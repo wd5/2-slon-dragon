@@ -47,7 +47,7 @@ class CustomUser(User):
         verbose_name_plural = u'пользователи'
 
     def get_addresses(self):
-        return self.customuseraddress_set.order_by('city')
+        return self.customuseraddress_set.order_by('-id')
 
     def get_orders(self):
         return self.order_set.all()

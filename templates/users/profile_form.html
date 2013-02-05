@@ -1,0 +1,26 @@
+{{ profile_form.media }}
+<div class="form profile_form" style="padding: 20px;">
+	<form class="form_faq" action="" method="post">{% csrf_token %}
+        <div style="display: none;">
+            {{ profile_form.errors }}
+            {{ profile_form.id }}
+            {{ profile_form.id.errors }}
+        </div>
+		<span class="form_caption">Изменение ФИО</span>
+        {{ profile_form.old_password.errors }}
+        {{ profile_form.re_password.errors }}
+		<div class="input"><label>Фамилия</label>
+            {{ profile_form.last_name }}
+            {{ profile_form.last_name.errors }}
+        </div>
+		<div class="input"><label>Имя</label>
+            {{ profile_form.first_name }}
+            {{ profile_form.first_name.errors }}
+        </div>
+		<div class="input"><label>Отчество</label>
+            {{ profile_form.third_name }}
+            {{ profile_form.third_name.errors }}
+        </div>
+		<input type="button" class="save_profile" value="Сохранить" />
+	</form>
+</div>

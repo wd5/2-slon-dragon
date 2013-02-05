@@ -24,9 +24,10 @@ class CategoryAdminForm(forms.ModelForm):
             )
 
 class CategoryAdmin(AdminImageMixin, MPTTModelAdmin):
-    list_display = ('id','title','parent','slug','order','is_published',)
+    list_display = ('id','title','slug','order','is_published',)
     list_display_links = ('id','title',)
     list_editable = ('order','is_published',)
+    list_filter = ('parent',)
     form = CategoryAdminForm
 
 admin.site.register(Category, CategoryAdmin)
@@ -34,9 +35,9 @@ admin.site.register(Category, CategoryAdmin)
 
 class FeatureValueInline(admin.TabularInline):
     model = FeatureValue
-    extra = 1
+    extra = 0
 
-class PhotoInline(admin.TabularInline):
+class PhotoInline(AdminImageMixin, admin.TabularInline):
     model = Photo
 
 class ProductAdminForm(forms.ModelForm):
@@ -53,16 +54,14 @@ class ProductAdmin(AdminImageMixin, admin.ModelAdmin):
     list_editable = ('order','is_published',)
     list_filter = ('is_published','category','is_new','is_recomended',)
     search_fields = ('title', 'description', 'art',)
-    inlines = [PhotoInline, FeatureValue]
+    filter_horizontal = ('related_products',)
+    inlines = [PhotoInline, FeatureValueInline]
     form = ProductAdminForm
 
 admin.site.register(Product, ProductAdmin)
 
 class FeatureNameAdmin(admin.ModelAdmin):
-    list_display = ('id','title','order','is_published',)
+    list_display = ('id','title',)
     list_display_links = ('id','title',)
-    list_editable = ('order','is_published',)
-    list_filter = ('is_published')
-    search_fields = ('title',)
 
 admin.site.register(FeatureName, FeatureNameAdmin)

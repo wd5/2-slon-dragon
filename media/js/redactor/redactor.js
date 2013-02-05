@@ -147,7 +147,7 @@ var RLANG = {
 			wym: false,
 
 			convertLinks: true,
-			convertDivs: true,
+			convertDivs: false,
 			protocol: 'http://', // for links http or https or ftp or false
 
 			autosave: false, // false or url

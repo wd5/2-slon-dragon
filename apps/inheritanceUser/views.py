@@ -1,9 +1,10 @@
 # -*- coding: utf-8 -*-
+from django.views.decorators.csrf import csrf_exempt
 import  settings
-from django.http import   HttpResponseRedirect
+from django.http import   HttpResponseRedirect, HttpResponse, HttpResponseBadRequest
 from django.shortcuts import render_to_response
 from django.template.loader import render_to_string
-from django.views.generic import FormView, TemplateView
+from django.views.generic import FormView, TemplateView, View
 from apps.inheritanceUser.forms import ProfileForm, RegistrationForm
 from apps.inheritanceUser.models import CustomUser
 from apps.orders.models import Order
@@ -63,7 +64,7 @@ class RegistrationFormView(FormView):
             if user is not None:
                 auth_login(request, user)
                 return HttpResponseRedirect('/cabinet/')
-            return HttpResponseRedirect('/category/')
+            return HttpResponseRedirect('/catalog/')
         else:
             return render_to_response('users/registration.html',
                     {'reg_form': reg_form, 'request': request, 'user': request.user})
@@ -108,6 +109,27 @@ show_profile_form = ShowProfileForm.as_view()
 class ShowCabinetView(TemplateView):
     template_name = 'users/cabinet.html'
 
+    def post(self, request, *args, **kwargs):
+        if not request.is_ajax():
+            return HttpResponseBadRequest('error')
+        else:
+            try:
+                data = request.POST.copy()
+                instance_object = CustomUser.objects.get(id=request.user.id)
+                form = ProfileForm(data, instance=instance_object)
+                if form.is_valid():
+                    form.save()
+                    return HttpResponse('success')
+                else:
+#                    form_html = render_to_string(
+#                        'users/cabinet_address_form.html',
+#                            {'form': form,
+#                             'type': 'add'}
+#                    )
+                    return HttpResponse('error')
+            except:
+                return HttpResponseBadRequest('error')
+
     def get(self, request, **kwargs):
         if self.request.user.is_authenticated and self.request.user.id:
             pass
@@ -118,8 +140,23 @@ class ShowCabinetView(TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super(ShowCabinetView, self).get_context_data()
-        #context['???????'] = ???
+        orders = self.request.user.get_orders()
+        context['orders'] = orders
+        context['form'] = ProfileForm()
         return context
 
 show_cabinet = ShowCabinetView.as_view()
 
+# AJAX
+
+#class SaveDCNumber(View):
+#    def post(self, request, *args, **kwargs):
+#        if not request.is_ajax():
+#            return HttpResponseRedirect('/')
+#        else:
+#            if 'city' not in request.POST:
+#                return HttpResponseBadRequest()
+#
+#            return HttpResponseBadRequest()
+#
+#save_discount_card_number = csrf_exempt(SaveDCNumber.as_view())

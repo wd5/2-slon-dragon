@@ -104,12 +104,13 @@ class Order(models.Model):
     order_status = models.CharField(max_length=30, verbose_name=u'Статус заказа', choices=order_status_choices, )
 
     index = models.CharField(max_length=50, verbose_name=u'индекс', blank=True)
+    city = models.CharField(max_length=50, verbose_name=u'город', blank=True)
     street = models.CharField(max_length=70, verbose_name=u'улица', blank=True)
     house_no = models.CharField(max_length=70, verbose_name=u'дом', blank=True)
     apartment = models.CharField(max_length=20, verbose_name=u'квартира', blank=True)
     note = models.CharField(max_length=255, verbose_name=u'примечание', blank=True)
 
-    total_price = models.CharField(max_length=100, verbose_name=u'общая стоимость', help_text=u'с учётом доставки')
+    total_price = models.DecimalField(verbose_name=u'общая стоимость', decimal_places=2, max_digits=10, help_text=u'с учётом доставки')
     create_date = models.DateTimeField(verbose_name=u'Дата оформления', default=datetime.datetime.now)
 
     class Meta:
@@ -140,9 +141,12 @@ class Order(models.Model):
         return self.get_products().count()
 
     def get_total(self):
-        sum = 0
-        for order_product in self.orderproduct_set.select_related().all():
-            sum += order_product.get_total()
+        if self.total_price:
+            sum = self.total_price
+        else:
+            sum = 0
+            for order_product in self.orderproduct_set.select_related().all():
+                sum += order_product.get_total()
         return sum
 
     def get_str_total(self):
@@ -182,14 +186,12 @@ class OrderProduct(models.Model):
         total = Decimal(self.get_total())
         return moneyfmt(total)
 
+class EmsCity(models.Model):
+    value = models.CharField(max_length=100, verbose_name=u'Код')
+    name = models.CharField(max_length=100, verbose_name=u'Название')
 
-#class EmsCity(models.Model):
-#    value = models.CharField(max_length=100, verbose_name=u'Код')
-#    name = models.CharField(max_length=100, verbose_name=u'Название')
-#
-#    def __unicode__(self):
-#        return self.value
-#
-#    class Meta:
-#        verbose_name = _(u'product_item')
-#        verbose_name_plural = _(u'product_items')
+    def __unicode__(self):
+        return self.value
+
+    class Meta:
+        ordering = ('name',)

@@ -44,14 +44,6 @@ class RegistrationForm(forms.ModelForm):
         return self.cleaned_data
 
 class ProfileForm(forms.ModelForm):
-    id = forms.CharField(
-        widget=forms.TextInput(
-            attrs={
-                'required':'required',
-            }
-        ),
-        required=True
-    )
     first_name = forms.CharField(
         widget=forms.TextInput(
             attrs={
@@ -87,7 +79,7 @@ class ProfileForm(forms.ModelForm):
 
     class Meta:
         model = CustomUser
-        fields = ('id', 'first_name', 'last_name', 'third_name', 'b_day', 'email', 'phone',)
+        fields = ('first_name', 'last_name', 'email', 'phone', 'is_receive_mailer',)
 
     def save(self, commit=True):
         user = super(ProfileForm, self).save()

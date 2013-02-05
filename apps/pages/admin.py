@@ -52,8 +52,8 @@ class MetaDataAdmin(admin.ModelAdmin):
     list_display=('url', 'title',)
     search_fields=('url','title',)
 
-admin.site.register(MetaData, MetaDataAdmin)
-admin.site.register(Page, PageAdmin)
+#admin.site.register(MetaData, MetaDataAdmin)
+#admin.site.register(Page, PageAdmin)
 
 
   
