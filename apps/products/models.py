@@ -74,7 +74,7 @@ class Category(MPTTModel):
             return self.product_set.published()
 
 class Product(models.Model):
-    category = models.ForeignKey(Category, verbose_name=u'Категория')
+    category = models.ForeignKey(Category, verbose_name=u'Категория', blank=True, null=True)
     title = models.CharField(verbose_name=u'Название', max_length=400)
     art = models.CharField(verbose_name=u'артикул', max_length=50, blank=True)
     price = models.DecimalField(verbose_name=u'Цена', decimal_places=2, max_digits=10, blank=True, null=True)
@@ -85,6 +85,9 @@ class Product(models.Model):
     is_new = models.BooleanField(verbose_name = u'Новинка', default=False)
     is_recomended = models.BooleanField(verbose_name = u'отображать в блоке "Рекомендуем"', default=False)
     sale_value = models.CharField(verbose_name=u'Скидка', max_length=50, blank=True)
+
+    xml_id = models.IntegerField(verbose_name=u'Идентификатор из xml файла', blank=True, null=True)
+    remainder = models.DecimalField(verbose_name=u'Остаток из xml файла', decimal_places=2, max_digits=10, blank=True, null=True)
 
     related_products = models.ManyToManyField("self", verbose_name=u'Похожие товары', blank=True, null=True,)
 
@@ -97,7 +100,7 @@ class Product(models.Model):
     class Meta:
         verbose_name =_(u'product_item')
         verbose_name_plural =_(u'product_items')
-        ordering = ['-order', 'title']
+        ordering = ['-id',]
 
     def __unicode__(self):
         return u'%s. Артикул: %s' % (self.title,self.art)
