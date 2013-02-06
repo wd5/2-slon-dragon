@@ -31,7 +31,6 @@
 
 <body>
 
-{% comment %}
 <!-- вытаскиваю из контекстного процессора -->
 {{ phonenum }}
 {{ workemail }}
@@ -56,15 +55,14 @@
 
 <!-- шаблонынй тэг cлайдер -->
 {% block_slider %}
-{% endcomment %}
 
 
 {% block main %}
 
 {% endblock %}
 
-{% comment %}<!-- шаблонынй тэг меню в самом низу страницы -->
-{% block_footer_menu %}{% endcomment %}
+<!-- шаблонынй тэг меню в самом низу страницы -->
+{% block_footer_menu %}
 
 <!-- форма авторизации -->
 {% if not user.is_authenticated %}
