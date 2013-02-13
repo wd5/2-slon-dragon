@@ -101,7 +101,7 @@ class Order(models.Model):
 
     order_carting = models.CharField(max_length=30, verbose_name=u'Тип доставки', choices=order_carting_choices, )
     order_payment = models.CharField(max_length=30, verbose_name=u'Тип оплаты', choices=order_payment_choices, )
-    order_status = models.CharField(max_length=30, verbose_name=u'Статус заказа', choices=order_status_choices, )
+    order_status = models.CharField(max_length=30, verbose_name=u'Статус заказа', choices=order_status_choices, default=u'processed')
 
     index = models.CharField(max_length=50, verbose_name=u'индекс', blank=True)
     city = models.CharField(max_length=50, verbose_name=u'город', blank=True)
@@ -110,7 +110,7 @@ class Order(models.Model):
     apartment = models.CharField(max_length=20, verbose_name=u'квартира', blank=True)
     note = models.CharField(max_length=255, verbose_name=u'примечание', blank=True)
 
-    total_price = models.DecimalField(verbose_name=u'общая стоимость', decimal_places=2, max_digits=10, help_text=u'с учётом доставки')
+    total_price = models.DecimalField(verbose_name=u'общая стоимость', decimal_places=2, max_digits=10, help_text=u'с учётом доставки', blank=True, null=True)
     create_date = models.DateTimeField(verbose_name=u'Дата оформления', default=datetime.datetime.now)
 
     class Meta:

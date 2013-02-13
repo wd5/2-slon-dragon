@@ -16,10 +16,6 @@
             {{ order_form.order_payment }}
             {{ order_form.order_payment.errors }}
             {{ order_form.order_carting.errors }}
-            {{ order_form.order_status }}
-            {{ order_form.order_status.errors }}
-            {{ order_form.total_price }}
-            {{ order_form.total_price.errors }}
             {{ order_form.city }}
             {{ order_form.city.errors }}
         </div>
@@ -68,7 +64,7 @@
 
         <!--  на change для этого селекта будет вычисления EmsPrice после вычисления значение будет выводиться
         пользователю и заполняться в инпут delivery_price (EmsPrice функция в script.js, я её просто скопировал) -->
-        <select>
+        <select name="ems_city">
             {% for ems_city in ems_cities %}
                 <option value="{{ ems_city.value }}">{{ ems_city.name }}</option>
             {% endfor %}

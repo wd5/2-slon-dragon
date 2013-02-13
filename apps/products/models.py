@@ -78,6 +78,7 @@ class Product(models.Model):
     title = models.CharField(verbose_name=u'Название', max_length=400)
     art = models.CharField(verbose_name=u'артикул', max_length=50, blank=True)
     price = models.DecimalField(verbose_name=u'Цена', decimal_places=2, max_digits=10, blank=True, null=True)
+    old_price = models.DecimalField(verbose_name=u'Старая Цена', decimal_places=2, max_digits=10, blank=True, null=True)
     description = models.TextField(verbose_name=u'Описание', blank=True)
     image = ImageField(verbose_name=u'Картинка', upload_to=file_path_Product, blank=False)
     video_code = models.TextField(verbose_name=u'Код видеоролика', help_text=u'короткая или полная ссылка на видео с Youtube', blank=True)
