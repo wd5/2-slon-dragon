@@ -1,0 +1,9 @@
+<uwsgi>
+    <pythonpath>/home/user/slondrakon/</pythonpath>
+    <pythonpath>/home/user/</pythonpath>
+    <app mountpoint="/">
+        <script>django_wsgi</script>
+    </app>
+    <workers>3</workers>
+    <touch-reload>/home/user/slondrakon/reload.txt</touch-reload>
+</uwsgi>

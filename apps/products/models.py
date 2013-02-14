@@ -56,10 +56,10 @@ class Category(MPTTModel):
 
     def get_bread_product(self):
         if self.is_child_node():
-            abs_bread = u'<a href="%s">%s</a> / <a href="%s">%s</a>' % (self.parent.get_absolute_url(), self.parent.title, self.get_absolute_url(), self.title)
+            abs_bread = u'<a href="%s" class="bread-lnk">%s</a> / <a href="%s" class="bread-lnk">%s</a>' % (self.parent.get_absolute_url(), self.parent.title, self.get_absolute_url(), self.title)
             return u'%s' % abs_bread
         else:
-            return u' <a href="%s">%s</a>' % (self.get_absolute_url(), self.title)
+            return u' <a href="%s" class="bread-lnk">%s</a>' % (self.get_absolute_url(), self.title)
 
     def get_products(self):
         if self.get_children():

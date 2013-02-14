@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+
+{% load thumbnail siteblocks_extras pages_extras %}
+
+{% block title %}
+    Регистрация &mdash;
+{% endblock %}
+
+{% block main %}
+    <div class="center">
+        <h1>Войти</h1>
+        <form method="post" action="{{ request.get_full_path }}">{% csrf_token %}
+
+            <div class="input">
+                <label><span>E-mail:</span>{{ auth_form.username }}{{ auth_form.username.errors }}<div class="help-text">{{ auth_form.non_field_errors }}</div></label>
+            </div>
+            <div class="input">
+                <label><span>Пароль:</span>{{ auth_form.password }}{{ auth_form.password.errors }}</label>
+            </div>
+            <div class="check-col-margin">
+                <div class="submit btn-green">
+                    <div><input type="submit" value="Войти" /></div>
+                </div>
+            </div>
+        </form>
+    </div>
+{% endblock %}

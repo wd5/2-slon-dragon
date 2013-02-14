@@ -27,6 +27,10 @@ def settings(request):
         phonenum = Settings.objects.get(name='phonenum').value
     except Settings.DoesNotExist:
         phonenum = False
+    try:
+        prod_cnt = Settings.objects.get(name='prod_cnt').value
+    except:
+        prod_cnt = 15
 
     return {
         'phonenum': phonenum,
@@ -36,4 +40,5 @@ def settings(request):
         'payment_text': payment_text,
         'return_text': return_text,
         'site_name': SITE_NAME,
-    }
+        'prod_cnt': prod_cnt,
+        }

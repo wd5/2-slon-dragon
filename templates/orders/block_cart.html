@@ -1,32 +1,69 @@
+{% load thumbnail %}
 {% if is_empty %}
     {% if type == 'short' %}
-        <div class="cart_short">
-            Корзина Пока пуста
+        <div class="up-cart-cnt">Корзина пока пуста</div>
+        <div class="submit">
+            <div>
+                <a href="#"><span class="cart-icon"></span>Корзина</a>
+            </div>
         </div>
     {% else %}
-        <div class="cart_drop">
-            Корзина Пока пуста
-        </div>
+        <div class="up-cart-pl-out">
+            <div class="up-cart-shar-l"></div>
+            <div class="up-cart-shar-r"></div>
+            <div class="up-cart-pl">
+                <div class="up-cart-pl-top"></div>
+                <div class="up-item">
+                    <h2 style="text-align: center">
+                        Ваша корзина пока пуста
+                    </h2>
+                </div>
+            </div>
+        </div><!--/up-cart-->
     {% endif %}
 {% else %}
     {% if type == 'short' %}
-        <div class="cart_short">
-            {{ cart_products_count }} {{ cart_products_text }} на {{ cart_total }} руб.
+        <div class="up-cart-cnt">{{ cart_products_count }} {{ cart_products_text }} на <span>{{ cart_total }} ₷</span></div>
+        <div class="submit">
+            <div>
+                <a href="#"><span class="cart-icon"></span>Корзина</a>
+            </div>
         </div>
     {% else %}
-        <div class="cart_drop">
-            {% for cart_product in cart.get_products %}
-                <div>
-                    {{ cart_product.product.title }}
-                    {{ cart_product.product.get_absolute_url }}
-                    {{ cart_product.count }}
-                    {{ cart_product.get_str_total }}
+        <div class="up-cart-pl-out">
+            <div class="up-cart-shar-l"></div>
+            <div class="up-cart-shar-r"></div>
+            <div class="up-cart-pl">
+                <div class="up-cart-pl-top"></div>
+                {% for cart_product in cart.get_products %}
+                    <div class="up-item">
+                        <div class="up-item-img">
+                            {% thumbnail cart_product.product.image "80x80" as img %}
+                                <img src="{{ img.url }}" alt="" />
+                            {% endthumbnail %}
+                        </div>
+                        <div class="up-item-des">
+                            <a href="{{ cart_product.product.get_absolute_url }}" class="up-item-name">{{ cart_product.product.title }}</a>
+                            <div class="up-item-cnt">{{ cart_product.count }} шт. за <b>{{ cart_product.get_str_total }} ₷</b></div>
+                        </div>
+                    </div>
+                {% endfor %}
+                <div class="up-total">Итого <b>{{ cart_total }} ₷</b></div>
+                <div class="up-cart-btns">
+                    <div class="submit btn-grey">
+                        <div>
+                            <a href="/cart/">В корзину</a>
+                        </div>
+                    </div>
+                    <div class="submit btn-green">
+                        <div>
+                            <a href="/cart/show_order_form/">Оформить</a>
+                        </div>
+                    </div>
                 </div>
-            {% endfor %}
-            Итого: {{ cart_total }} руб.
-            <a href="/cart/">В корзину</a>
-            <a href="/cart/show_order_form/">Оформить</a>
-        </div><!--/cartbox-->
+                <div class="up-cart-konf"></div>
+            </div>
+        </div><!--/up-cart-->
     {% endif %}
 {% endif %}
 

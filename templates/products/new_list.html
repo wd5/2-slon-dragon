@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% load thumbnail products_extras %}
+{% load thumbnail products_extras pagination_tags %}
 
 {% block title %}
      &mdash;
@@ -9,17 +9,46 @@
 {% block main %}
     {% block_category_menu request.path %}
 
-    New
+    <div class="center">
+        <div class="cats">
+            <div class="cats-curr">Новые</div>
+        </div>
+        <div class="items">
+            {% autopaginate new_products prod_cnt %}
+            {% for product in new_products %}
+                <div class="item">
+                    {% if product.is_new %}
+                        <div class="item-new">NEW</div>
+                    {% endif %}
+                    {% if product.sale_value %}
+                        <div class="item-sale">{{ product.sale_value }} <span>скидка</span></div>
+                    {% endif %}
+                    <div class="item-img">
+                        <a href="{{ product.get_absolute_url }}">
+                            {% thumbnail product.image "160x160" as img %}
+                                <img src="{{ img.url }}" alt="" />
+                            {% endthumbnail %}
+                        </a>
+                    </div>
+                    <div class="item-des">
+                        <a href="{{ product.get_absolute_url }}" class="item-des-name">{{ product.title }}</a>
+                    </div>
+                    <div class="item-price">{% if product.sale_value %}<span class="old-price">{{ product.get_str_price_old }} ₷</span> {% endif %}{{ product.get_str_price }} ₷</div>
+                    <a href="{{ product.get_absolute_url }}"></a>
 
-    {% for product in new_products %}
-    <div>
-        <a href="{{ product.get_absolute_url }}">{{ product.title }}</a>
-        {{ product.get_str_price }}
-        {{ product.image }}
-        {{ product.is_new }}
-        {{ product.sale_value }}
-    </div>
-    {% endfor %}
+                </div>
+            {% endfor %}
+            <div class="show-more">
+                <div class="btn-round">
+                    <div class="submit btn-lgrey small-font">
+                        <div>
+                            <a href="#">Показать еще 15 товаров</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div><!--/items-->
+    </div><!--/center-->
 
 {% endblock %}
 

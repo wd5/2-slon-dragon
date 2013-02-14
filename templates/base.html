@@ -8,8 +8,10 @@
     <link href="/media/js/fancybox/jquery.fancybox.css" rel="stylesheet" type="text/css" />
     <link href="/media/js/fancybox/helpers/jquery.fancybox-thumbs.css" rel="stylesheet" type="text/css" />
     <link href="/media/css/style.css" rel="stylesheet" type="text/css" />
+    <link href="/media/css/selectbox.css" rel="stylesheet" type="text/css" />
     <!--[if lte IE 8]><link rel="stylesheet" type="text/css" media="screen" href="/media/css/ie.css" /><![endif]-->
     <script type="text/javascript" src="/media/js/jquery.js"></script>
+    <script type="text/javascript" src="/media/js/jquery.selectbox.min.js"></script>
     <script type="text/javascript" src="/media/js/jquery.masonry.js"></script>
     <script type="text/javascript" src="/media/js/fancybox/jquery.fancybox.js"></script>
     <script type="text/javascript" src="/media/js/fancybox/helpers/jquery.fancybox-thumbs.js"></script>
@@ -30,62 +32,145 @@
 </head>
 
 <body>
-
-<!-- вытаскиваю из контекстного процессора -->
-{{ phonenum }}
-{{ workemail }}
-
-{{ delivery_text|safe }}
-{{ payment_text|safe }}
-{{ return_text|safe }}
-{{ contacts|safe }}
-
-{% if user.is_authenticated %}
-    <a href="/cabinet/">Личный кабинет</a>
-{% else %}
-    <a class="fancybox" href="#auth_form">Вход</a>
-    <a href="/cabinet/registration_form/">Регистрация</a>
-{% endif %}
-
-<!-- надпись "2 товара на 1 420" -->
-{% block_cart 'short' %}
-
-<!-- блок-выпадашка с товарами -->
-{% block_cart 'block' %}
-
-<!-- шаблонынй тэг cлайдер -->
-{% block_slider %}
-
-
-{% block main %}
-
-{% endblock %}
-
-<!-- шаблонынй тэг меню в самом низу страницы -->
-{% block_footer_menu %}
-
-<!-- форма авторизации -->
-{% if not user.is_authenticated %}
-    <div style="display: none;">
-        <form class="auth_form" id="auth_form" method="post" action="{% url auth_login %}?next={% if request.path == '/show_order_form/' %}{{ request.path }}{% else %}{{ next_url }}{% endif %}">
-            {% csrf_token %}
-            <div class="window-form">
-                <div class="window-form-title"><b>Войти</b> или <a href="/cabinet/registration_form/" class="window-form-doreg">зарегистрироваться</a></div>
-                <div class="input">
-                    <span>E-mail:</span>{{ auth_form.username }}{{ auth_form.username.errors }}
-                </div>
-                <div class="input">
-                    <span>Пароль:</span>{{ auth_form.password }}{{ auth_form.password.errors }}
-                    <a class="help-text" href="/cabinet/password/reset/">Забыли пароль?</a>
-                </div>
+<div class="wrapper-out">
+<div class="up-out">
+    <div class="up">
+        <div class="up-in">
+            <div class="up-help">
                 <div class="submit">
                     <div>
-                        <input type="submit" value="Войти" />
+                        <a href="#"><span class="help-icon"></span>Справка</a>
                     </div>
                 </div>
+                <div class="contacts">
+                    <div class="tel">{{ phonenum }}</div>
+                </div><!--/contacts-->
+            </div><!--up-help-->
+            <div class="up-login">
+                {% if user.is_authenticated %}
+                    <a href="/cabinet/">Личный кабинет</a> или
+                    <a href="/logout">выход</a>
+                {% else %}
+                    <a class="auth_lnk" href="#auth_form">Вход</a> или <a href="/cabinet/registration_form/">регистрация</a>
+                {% endif %}
+            </div><!--/up-login-->
+            <div class="up-cart">
+                <!-- надпись "2 товара на 1 420" -->
+                {% block_cart 'short' %}
+            </div><!--/up-cart-->
+        </div><!--/up-in-->
+        <div class="up-dropdown-out1">
+            <div class="up-dropdown-outt"></div>
+            <div class="up-dropdown-out">
+                <div class="up-dropdown">
+                    <div class="up-col">
+                        <!-- вытаскиваю из контекстного процессора -->
+                        <div class="text">
+                            {{ delivery_text|safe }}
+                        </div>
+                    </div><!--/up-col-->
+                    <div class="up-col">
+                        <div class="text">
+                            {{ payment_text|safe }}
+                        </div>
+                    </div><!--/up-col-->
+                    <div class="up-col">
+                        <div class="text">
+                            {{ return_text|safe }}
+                        </div>
+                    </div><!--/up-col-->
+                    <div class="up-col">
+                        <div class="text">
+                            {{ contacts|safe }}
+                        </div>
+                    </div><!--/up-col-->
+                </div>
             </div>
-        </form>
+        </div><!--/up-dropdown-->
+        <!-- блок-выпадашка с товарами -->
+        {% block_cart 'block' %}
     </div>
+</div><!--/up-->
+<div class="wrapper">
+
+<!--PAGE-->
+<div class="page">
+
+<!--HEADER-->
+<div class="header">
+    <a id="logo_box" href="/" title="Слон-дракон"><img id="logo" src="/media/img/logo.png" alt="Слон-дракон" width="199" height="163" /></a>
+    <!-- шаблонынй тэг cлайдер -->
+    {% block_slider %}
+</div>
+<!--/HEADER-->
+
+
+<!--MAIN-->
+<div class="main">
+    {% block main %}
+
+    {% endblock %}
+</div>
+<!--/MAIN-->
+
+
+<!--FOOTER-->
+<div class="footer">
+    <div class="left">
+        <div class="footer-tel">{{ phonenum }}</div>
+        <a href="mailto:{{ workemail }}">{{ workemail }}</a>
+        <div class="socs">
+{#            <a href="#" class="soc"><img src="media/images/vk.com" alt="" /></a>#}
+{#            <a href="#" class="soc"><img src="media/images/fb.com" alt="" /></a>#}
+{#            <a href="#" class="soc"><img src="media/images/tw.com" alt="" /></a>#}
+        </div>
+    </div>
+    <div class="center">
+        <div class="footer-menu">
+            <!-- шаблонынй тэг меню в самом низу страницы -->
+            {% block_footer_menu %}
+        </div>
+        <div id="copyright">© 2011–2012 Слон-Дракон, все цены указаны в российских рублях | <span class="madein">Сайт сделан в студии «<a href="http://octoberweb.ru">OctoberWeb</a>»</span></div>
+    </div>
+    <div class="footer-sh"></div>
+</div>
+<!--/FOOTER-->
+
+</div>
+<!--/PAGE-->
+
+</div>
+</div><!--/wrapper-->
+{% if not user.is_authenticated %}
+    <div class="overlay">
+    <div class="window-out">
+        <div class="shar-t"></div>
+        <div class="shar-r"></div>
+        <div class="konf-red"></div>
+        <div class="konf-purp"></div>
+        <div class="konf-yel"></div>
+        <div class="pugov-red"></div>
+        <div class="pugov-green"></div>
+        <div class="pugov-purp"></div>
+        <div class="window">
+            <form class="auth_form" id="auth_form" method="post" action="{% url auth_login %}?next={% if request.path == '/show_order_form/' %}{{ request.path }}{% else %}{{ next_url }}{% endif %}">
+                <h1><b>Войти</b> или <a href="/cabinet/registration_form/" class="window-form-doreg">зарегистрироваться</a></h1>
+                <div class="input">
+                    <label><span>E-mail:</span>{{ auth_form.username }}<div class="help-text">{{ auth_form.username.errors }}</div></label>
+                </div>
+                <div class="input">
+                    <label><span>Пароль:</span>{{ auth_form.password }}<div class="help-text">{{ auth_form.password.errors }}<a href="/cabinet/password/reset/">Забыли пароль?</a></div></label>
+                </div>
+                <div class="check-col-margin">
+                    <div class="submit btn-green">
+                        <div><input type="submit" value="Войти" /></div>
+                    </div>
+                </div>
+            </form>
+        </div>
+        <a href="#" class="window-close"></a>
+    </div>
+</div>
 {% endif %}
 
 

@@ -10,19 +10,96 @@
 
     {% block_category_menu request.path %}
 
-    {{ product.category.get_bread_product|upper|safe }}
-    {{ product.title }}
-    {{ product.art }}
-    {{ product.image }}
-    {{ product.get_str_price }}
-    {{ product.description|safe }}
-    {% if product.video_code %}
-        <a class="fancybox-media" href="{{ product.video_code }}">Видео</a>
-    {% endif %}
+    <div class="center">
+        <div class="bread">{{ product.category.get_bread_product|safe }}</div>
+        <div class="item-page">
+            <h1>{{ product.title }} <span class="item-art"> {{ product.art }}</span></h1>
+            <div class="item-imgs item-left">
+                <div class="item-img-zl">
+                    {% thumbnail product.image "400x400" as img %}
+                        <img src="{{ img.url }}" alt="" />
+                    {% endthumbnail %}
+                </div>
+                {% for photo in product.get_photos %}
+                    <div class="item-img-zss">
+                        {% thumbnail photo.image "60x60" as img %}
+                            {% if not forloop.first %}-->{% endif %}<span class="item-img-zs{% if forloop.first %} current{% endif %}"><img src="{{ img.url }}" alt="" /><a href="#" class="item-img-fr"></a></span>{% if not forloop.last %}<!--{% endif %}
+                        {% endthumbnail %}
+                    </div>
+                {% endfor %}
+            </div><!--/item-imgs-->
+            <div class="item-right">
+                <div class="item-pars">
+                    <!-- харакетристики товара -->
+                    {% for feature_value in product.get_feature_values %}
+                        <div class="item-par">
+                            <div class="item-par-name">{{ feature_value.feature_name.title }}</div>
+                            <div class="item-par-val">{{ feature_value.value }}</div>
+                        </div>
+                    {% endfor %}
+                </div>
+                <div class="tocart">
+                    <div class="tocart-price">
+                        цена
+                        <div>{{ product.get_str_price }} ₷</div>
+                    </div>
+                    <div class="submit btn-green">
+                        <div>
+                            <a href="#" id="buy_submit" data-num="{{ product.id }}">В корзину</a>
+                        </div>
+                    </div>
+                </div><!--/tocart-->
+            </div><!--/item-pars-->
+            <div class="item-left text">
+                {{ product.description|safe }}
+            </div>
+            <div class="item-right">
+                {% if product.video_code %}
+                    <div class="item-info">
+                        <div class="item-info-title">Видео</div>
+                        <div class="item-info-video">
+                            <img src="/media/images/video.jpg" alt="" />
+                            <a class="fancybox-media play" href="{{ product.video_code }}">Видео</a>
+                        </div>
+                    </div>
+                {% endif %}
+                <div class="item-info">
+                    <div class="item-info-title">Рассказать друзьям</div>
+                    <div class="item-info-soc">
+                        <a href="#" class="item-soc"><img src="media/img/fb_zl.png" alt="" /></a>
+                        <a href="#" class="item-soc"><img src="media/img/tw_zl.png" alt="" /></a>
+                        <a href="#" class="item-soc"><img src="media/img/vk_zl.png" alt="" /></a>
+                    </div>
+                </div>
+            </div>
+        </div><!--/item-page-->
+        <h1>Похожие товары</h1>
+        <div class="items">
+            {% for product in product.get_related_products %}
+                <div class="item">
+                    {% if product.is_new %}
+                        <div class="item-new">NEW</div>
+                    {% endif %}
+                    {% if product.sale_value %}
+                        <div class="item-sale">{{ product.sale_value }} <span>скидка</span></div>
+                    {% endif %}
+                    <div class="item-img">
+                        <a href="{{ product.get_absolute_url }}">
+                            {% thumbnail product.image "160x160" as img %}
+                                <img src="{{ img.url }}" alt="" />
+                            {% endthumbnail %}
+                        </a>
+                    </div>
+                    <div class="item-des">
+                        <a href="{{ product.get_absolute_url }}" class="item-des-name">{{ product.title }}</a>
+                    </div>
+                    <div class="item-price">{% if product.sale_value %}<span class="old-price">{{ product.get_str_price_old }} ₷</span> {% endif %}{{ product.get_str_price }} ₷</div>
+                    <a href="{{ product.get_absolute_url }}"></a>
 
-    {% for photo in product.get_photos %}
-        {{ photo.image }}
-    {% endfor %}
+                </div>
+            {% endfor %}
+        </div><!--/items-->
+    </div><!--/center-->
 
     <!-- для добавления товара в корзину, аяком POST на /cart/add_product_to_cart/ шлешь переменную
      product_id - айдишник продукта
@@ -35,25 +112,6 @@
       Но так как у нас 2 места где выводится корзина (это строка в шапке и блок-выпадашка), то передавай туда переменную
       type со значением 'short' или 'drop' соответственно. И тебе будет соответствующий html приходить для обновления.
       -->
-
-    <!-- харакетристики товара -->
-    {% for feature_value in product.get_feature_values %}
-        <div>
-            {{ feature_value.feature_name.title }} -
-            {{ feature_value.value }}
-        </div>
-    {% endfor %}
-
-    <!-- похожие товары -->
-    {% for product in product.get_related_products %}
-    <div>
-        <a href="{{ product.get_absolute_url }}">{{ product.title }}</a>
-        {{ product.get_str_price }}
-        {{ product.image }}
-        {{ product.is_new }}
-        {{ product.sale_value }}
-    </div>
-    {% endfor %}
 
 {% endblock %}
 
