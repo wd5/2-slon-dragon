@@ -10,7 +10,7 @@ class RegistrationOrderForm(forms.ModelForm):
 
     class Meta:
         model = Order
-        exclude = ('create_date',)
+        exclude = ('create_date','order_status','total_price',)
 
     def clean(self):
         cleaned_data = super(RegistrationOrderForm, self).clean()

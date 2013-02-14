@@ -51,6 +51,7 @@
                 <div class="check-col col_selfcarting{% if order_form.order_carting.value == 'selfcarting' %} current{% endif %}">
                     <div class="map">
 
+<<<<<<< HEAD
                     </div>
                 </div>
                 <div class="check-col col_selfcarting{% if order_form.order_carting.value == 'selfcarting' %} current{% endif %}">
@@ -143,5 +144,69 @@
                 </div>
             </div><!--check-step-->
         </div><!--/check-->
+=======
+        <div style="display: block;"> <!-- none; -->
+            {{ order_form.profile }}
+            {{ order_form.profile.errors }}
+            {{ order_form.order_carting }}
+            {{ order_form.order_payment }}
+            {{ order_form.order_payment.errors }}
+            {{ order_form.order_carting.errors }}
+            {{ order_form.city }}
+            {{ order_form.city.errors }}
+        </div>
+
+        {% if not user.is_authenticated %}<span class="ifregistred">Есть логин на нашем сайте? <a href="#auth_form" class="fancybox">Войти</a></span>{% endif %}
+
+        {{ order_form.first_name }}
+        {{ order_form.first_name.errors }}
+        {{ order_form.last_name }}
+        {{ order_form.last_name.errors }}
+        {{ order_form.email }}
+        {{ order_form.email.errors }}
+        {{ order_form.phone }}
+        {{ order_form.phone.errors }}
+
+        <!-- для выставления курента для способа доставки -->
+        {{ order_form.order_carting.value }}
+        <!-- для выставления галки на способ оплаты -->
+        {{ order_form.order_payment.value }}
+
+        <!--текст для блока Курьер -->
+        {{ express_text|safe }}
+        <!--текст для блока самовывоза -->
+        {{ selfcarting_text|safe }}
+
+        {{ order_form.index }}
+        {{ order_form.index.errors }}
+        {{ order_form.street }}
+        {{ order_form.street.errors }}
+        {{ order_form.house_no }}
+        {{ order_form.house_no.errors }}
+        {{ order_form.apartment }}
+        {{ order_form.apartment.errors }}
+        {{ order_form.note }}
+        {{ order_form.note.errors }}
+
+        {{ order_form.non_field_errors }}
+
+        <!--  это поле (delivery_price) нужно чтобы в него вносить стоимость доставки (чтобы потом добавить к стоимости заказа)
+         Если по емс - то в зависимости от выбранного города внести значение
+         Если самовывоз - то 0
+         Если курьер - то значение из настройки express_price -->
+        <input type="text" name="delivery_price" value="">
+        {{ express_price }}
+
+
+        <!--  на change для этого селекта будет вычисления EmsPrice после вычисления значение будет выводиться
+        пользователю и заполняться в инпут delivery_price (EmsPrice функция в script.js, я её просто скопировал) -->
+        <select name="ems_city">
+            {% for ems_city in ems_cities %}
+                <option value="{{ ems_city.value }}">{{ ems_city.name }}</option>
+            {% endfor %}
+        </select>
+
+        <input type="submit" name="cart_submit" value="Отправить заказ" />
+>>>>>>> 3a503b2f819fa6806508aa7c9afbaad4766d9a63
     </form>
 {% endblock %}

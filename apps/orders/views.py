@@ -152,11 +152,21 @@ class OrderFromView(FormView):
         order_form = RegistrationOrderForm(data)
         if order_form.is_valid():
             new_order = order_form.save()
-            try:
-                new_order.total_price += Decimal(request.POST['delivery_price'])
-                new_order.save()
-            except:
-                pass
+            new_order.total_price = cart.get_total()
+            if new_order.order_carting == u'carting':
+                try:
+                    express_price = Settings.objects.get(name='express_price').value
+                    new_order.total_price += Decimal(express_price)
+                except:
+                    pass
+            elif new_order.order_carting == u'country':
+                try:
+                    ems_price = GetEmsPrice('', request.POST['ems_city'], cart.get_products_count())
+                    if ems_price:
+                        new_order.total_price += Decimal(ems_price)
+                except:
+                    pass
+            new_order.save()
 
             for cart_product in cart_products:
                 ord_prod = OrderProduct(
@@ -257,7 +267,6 @@ class OrderFromView(FormView):
                     form.fields['phone'].initial = profile.phone
                     form.fields['order_carting'].initial = u'country'
                     form.fields['order_payment'].initial = u'cash_on_delivery'
-                    form.fields['order_status'].initial = u'processed'
                     try:
                         address = profile.get_addresses()[:1].get()
                         form.fields['index'].initial = address.index
@@ -268,16 +277,12 @@ class OrderFromView(FormView):
                         form.fields['note'].initial = address.note
                     except:
                         pass
-                    form.fields['total_price'].initial = cart_total
                 except CustomUser.DoesNotExist:
                     return HttpResponseBadRequest()
             else:
                 form.fields['profile'].queryset = CustomUser.objects.extra(where=['1=0'])
                 form.fields['order_carting'].initial = u'country'
                 form.fields['order_payment'].initial = u'cash_on_delivery'
-                form.fields['order_status'].initial = u'processed'
-                form.fields['total_price'].initial = cart_total
-
             context['order_form'] = form
         else:
             return HttpResponseRedirect('/')
@@ -555,11 +560,11 @@ class EmsCalculateView(View):
 
             cookies = request.COOKIES
             cookies_cart_id = False
-            if 'shoes_cart_id' in cookies:
-                cookies_cart_id = cookies['shoes_cart_id']
+            if 'slondragon_cart_id' in cookies:
+                cookies_cart_id = cookies['slondragon_cart_id']
 
             if self.request.user.is_authenticated and self.request.user.id:
-                profile_id = self.request.user.profile.id
+                profile_id = self.request.user.id
             else:
                 profile_id = False
 
@@ -576,20 +581,29 @@ class EmsCalculateView(View):
                 cart = False
 
             if cart:
-                try:
-                    ems_city = EmsCity.objects.get(name__iexact=city)
-                except:
-                    ems_city = False
-                if ems_city:
-                    city_code = ems_city.value # из москвы!
-                    carting_price_data = urllib.urlopen(
-                        'http://emspost.ru/api/rest?method=ems.calculate&from=city--moskva&to=%s&weight=%s' % (
-                            city_code, cart.get_products_count()))
-                    json_data = json.load(carting_price_data)
-                    return HttpResponse(json_data["rsp"]["price"])
-                else: # не нашли город
+                ems_price = GetEmsPrice(city, False, cart.get_products_count())
+                if ems_price:
+                    return HttpResponse(ems_price)
+                else: # не нашли город или ошибка
                     return HttpResponse('NotFound')
             else:
                 return HttpResponseBadRequest()
 
 ems_calculate = csrf_exempt(EmsCalculateView.as_view())
+
+def GetEmsPrice(city, city_code, weight):
+    try:
+        if city_code:
+            pass
+        else:
+            ems_city = EmsCity.objects.get(name__iexact=city)
+            city_code = ems_city.value # из москвы!
+        carting_price_data = urllib.urlopen(
+            'http://emspost.ru/api/rest?method=ems.calculate&from=city--moskva&to=%s&weight=%s' % (
+                city_code, weight))
+        json_data = json.load(carting_price_data)
+        return json_data["rsp"]["price"]
+    except:
+        return False
+
+
