@@ -112,6 +112,9 @@ class Product(models.Model):
     def get_str_price(self):
         return moneyfmt(self.price)
 
+    def get_str_old_price(self):
+        return moneyfmt(self.price)
+
     def get_photos(self):
         return self.photo_set.all()
 
