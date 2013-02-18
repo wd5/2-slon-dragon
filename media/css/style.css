@@ -276,6 +276,7 @@ h3 {
 	letter-spacing: 0;
 	text-transform: none;
 	color: #797979;
+    margin-right: -10px;
 }
 /*/accordion*/
 /*contacts*/
@@ -406,7 +407,7 @@ h3 {
 	border-radius: 8px;
 	background-color: #fffad5;
 	position: relative;
-	z-index: 1;
+	z-index: 2;
 }
 .menu li {
 	position: relative;
@@ -430,6 +431,7 @@ h3 {
 	float: left;
 	width: 36px;
 	text-align: center;
+    margin-left: 9px;
 }
 .menu li a:hover {
 	color: #906;
@@ -443,7 +445,7 @@ h3 {
 	border-color: transparent;
 }
 .menu li:hover .menu-img, .menu .current .menu-img {
-	padding: 8px 0;
+	padding: 6px 0 8px;
 }
 .menu li:hover a {
 	font-size: 26px;
@@ -601,6 +603,12 @@ h3 {
 	top: 6px;
 	right: 0;
 }
+.items-slider {
+    margin: 48px 0 0;
+}
+.items-slider .slider-left, .items-slider .slider-right {
+    opacity: 0.4;
+}
 .slider-left, .slider-right {
 	background: url(../img/slider-bg.png) 0 0 no-repeat;
 	height: 196px;
@@ -737,6 +745,7 @@ h3 {
 .item-img {
 	text-align: center;
 	height: 160px;
+    margin: 0 0 24px;
 }
 .item-des {
 	margin: 0 0 8px;
@@ -857,7 +866,7 @@ h3 {
 	margin: 4px 0 0 20px;
 }
 .item-img-zss {
-	margin: 0 0 48px 40px;
+	margin: 8px 0 48px 40px;
 }
 .item-img-zs {
 	display: inline-block;
@@ -1198,18 +1207,10 @@ h3 {
 	top: -13px;
 	left: 25px;
 }
-.p-input {
-	display: inline-block;
-	vertical-align: top;
-	margin: 0 36px 28px 0;
-	min-width: 100px;
-}
-.p-input input {
-	display: none;
-}
 .p-label {
 	color: #808080;
 	line-height: 14px;
+    margin: 0 0 4px;
 }
 .p-val a {
 	color: #000;
@@ -1525,7 +1526,7 @@ h3 {
 .input, .textarea, .sels {
 	margin: 0 0 24px;
 }
-.input input, .textarea textarea {
+.input input, .textarea textarea, .p-input input {
 	display: inline-block;
 	vertical-align: top;
 	background: #fbfbfb;
@@ -1575,6 +1576,30 @@ h3 {
 .input label span i, .textarea label span i {
 	display: block;
 	font: 14px/18px 'PT Sans', sans-serif;
+}
+.p-input {
+    display: inline-block;
+    vertical-align: top;
+    position: relative;
+    margin: 0 36px 28px 0;
+    min-width: 100px;
+}
+.p-input input {
+    display: none;
+    position: absolute;
+    left: -6px;
+    top: 14px;
+    width: 154px;
+}
+.p-ok {
+    display: none;
+    width: 21px;
+    height: 20px;
+    background: url(../img/ok.png) 0 0 no-repeat;
+    cursor: pointer;
+    position: absolute;
+    top: 23px;
+    left: 140px;
 }
 .help-text {
 	display: inline-block;
@@ -1653,6 +1678,16 @@ h3 {
 }
 .submit:active div {
 	background-position: 100% -190px;
+}
+.submit.no_active {
+    background-position: 0 0;
+    opacity: 0.3;
+}
+.submit.no_active div {
+    background-position: 100% -34px;
+}
+.submit.no_active a {
+    cursor: default;
 }
 .cart-icon, .help-icon, .left-arr {
 	display: inline-block;

@@ -7,7 +7,7 @@
     <meta name="keywords" content="{% block META_keywords %}{{ meta.keywords }}{% endblock %}"/>
     <link href="/media/js/fancybox/jquery.fancybox.css" rel="stylesheet" type="text/css" />
     <link href="/media/js/fancybox/helpers/jquery.fancybox-thumbs.css" rel="stylesheet" type="text/css" />
-    <link href="/media/css/style.css" rel="stylesheet" type="text/css" />
+    <link href="/media/css/style.css?v1.0" rel="stylesheet" type="text/css" />
     <link href="/media/css/selectbox.css" rel="stylesheet" type="text/css" />
     <!--[if lte IE 8]><link rel="stylesheet" type="text/css" media="screen" href="/media/css/ie.css" /><![endif]-->
     <script type="text/javascript" src="/media/js/jquery.js"></script>
@@ -17,7 +17,7 @@
     <script type="text/javascript" src="/media/js/fancybox/helpers/jquery.fancybox-thumbs.js"></script>
     <script type="text/javascript" src="/media/js/fancybox/helpers/jquery.fancybox-media.js"></script>
     <script type="text/javascript" src="/media/js/jquery.jcarousel.js"></script>
-    <script type="text/javascript" src="/media/js/script.js"></script>
+    <script type="text/javascript" src="/media/js/script.js?v1.0"></script>
     <script type="text/javascript" src="/media/js/sysMessage.js"></script>
     <title>
         {% block title %}
@@ -154,7 +154,7 @@
         <div class="pugov-purp"></div>
         <div class="window">
             <form class="auth_form" id="auth_form" method="post" action="{% url auth_login %}?next={% if request.path == '/show_order_form/' %}{{ request.path }}{% else %}{{ next_url }}{% endif %}">
-                <h1><b>Войти</b> или <a href="/cabinet/registration_form/" class="window-form-doreg">зарегистрироваться</a></h1>
+                {% csrf_token %}<h1><b>Войти</b> или <a href="/cabinet/registration_form/" class="window-form-doreg">зарегистрироваться</a></h1>
                 <div class="input">
                     <label><span>E-mail:</span>{{ auth_form.username }}<div class="help-text">{{ auth_form.username.errors }}</div></label>
                 </div>

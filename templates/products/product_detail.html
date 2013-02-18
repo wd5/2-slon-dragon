@@ -15,15 +15,19 @@
         <div class="item-page">
             <h1>{{ product.title }} <span class="item-art"> {{ product.art }}</span></h1>
             <div class="item-imgs item-left">
-                <div class="item-img-zl">
-                    {% thumbnail product.image "400x400" as img %}
-                        <img src="{{ img.url }}" alt="" />
-                    {% endthumbnail %}
-                </div>
                 {% for photo in product.get_photos %}
+                    {% if forloop.first %}
+                        <div class="item-img-zl">
+                            {% thumbnail photo.image "400x400" as img %}
+                                <img src="{{ img.url }}" alt="" />
+                            {% endthumbnail %}
+                        </div>
+                    {% endif %}
                     <div class="item-img-zss">
                         {% thumbnail photo.image "60x60" as img %}
-                            {% if not forloop.first %}-->{% endif %}<span class="item-img-zs{% if forloop.first %} current{% endif %}"><img src="{{ img.url }}" alt="" /><a href="#" class="item-img-fr"></a></span>{% if not forloop.last %}<!--{% endif %}
+                            {% thumbnail photo.image "400x400" as bimg %}
+                                {% if not forloop.first %}-->{% endif %}<span class="item-img-zs{% if forloop.first %} current{% endif %}"><img src="{{ img.url }}" alt="" /><a href="#" class="item-img-fr" rel="{{ bimg.url }}"></a></span>{% if not forloop.last %}<!--{% endif %}
+                            {% endthumbnail %}
                         {% endthumbnail %}
                     </div>
                 {% endfor %}

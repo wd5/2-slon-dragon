@@ -15,33 +15,38 @@
             <div class="personal-info">
                 <div class="personal-info-top"></div>
                 <div class="p-spam">
-                    <input type="checkbox" id="id-spam" checked="{{ user.is_receive_mailer }}"/>
+                    <input type="checkbox" id="id-spam" {% if user.is_receive_mailer %}checked{% endif %} name="spam"/>
                     <span>получать рассылку на этот e-mail</span>
                 </div>
                 <div class="p-input">
                     <div class="p-label">e-mail</div>
-                    <div class="p-val"><a href="#">{{ user.email }}</a></div>
-                    <input type="text" name="email"/>
+                    <div class="p-val"><a href="#">{% if user.email %}{{ user.email }}{% else %}Указать{% endif %}</a></div>
+                    <input type="text" name="email" value="{{ user.email }}" id="email"/>
+                    <span class="p-ok"></span>
                 </div>
                 <div class="p-input">
                     <div class="p-label">фамилия</div>
-                    <div class="p-val"><a href="#">{{ user.last_name }}</a></div>
-                    <input type="text" name="last_name" />
+                    <div class="p-val"><a href="#">{% if user.last_name %}{{ user.last_name }}{% else %}Указать{% endif %}</a></div>
+                    <input type="text" name="last_name" value="{{ user.last_name }}"  id="last_name"/>
+                    <span class="p-ok"></span>
                 </div>
                 <div class="p-input">
                     <div class="p-label">имя</div>
-                    <div class="p-val"><a href="#">{{ user.first_name }}</a></div>
-                    <input type="text" name="first_name" />
+                    <div class="p-val"><a href="#">{% if user.first_name %}{{ user.first_name }}{% else %}Указать{% endif %}</a></div>
+                    <input type="text" name="first_name" value="{{ user.first_name }}" id="first_name"/>
+                    <span class="p-ok"></span>
                 </div>
                 <div class="p-input">
                     <div class="p-label">телефон</div>
                     <div class="p-val"><a href="#">{% if user.phone %}{{ user.phone }}{% else %}Указать{% endif %}</a></div>
-                    <input type="text" name="phone" />
+                    <input type="text" name="phone" value="{{ user.phone }}"  id="phone"/>
+                    <span class="p-ok"></span>
                 </div>
                 <div class="p-input">
                     <div class="p-label">пароль</div>
                     <div class="p-val"><a href="#"><em>*********</em></a></div>
-                    <input type="password" />
+                    <input type="password"  id="password"/>
+                    <span class="p-ok"></span>
                 </div>
                 <div class="p-submit">
                     <div class="submit btn-green no_active">

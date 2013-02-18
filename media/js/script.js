@@ -88,6 +88,7 @@ $(function(){
 			} else {
 				$(this).parent().removeClass('i-on');
 			}
+            $(el).parent().parent().parent().find('.no_active').removeClass('no_active');
 			return false;
 		});
 	});
@@ -386,6 +387,72 @@ $(function(){
             $('.only_carting .i-on').removeClass('i-on');
             $('.only_carting .radio_overlay').show();
         }
+        return false;
+    })
+
+
+    $('.p-val a').live('click', function(){
+        el = $(this);
+        el.parent().parent().parent().find('.p-input').css('z-index','auto').find('input').hide();
+        $('.p-ok').hide();
+        el.parent().parent().css('z-index',1).find('input').show().focus().parent().find('.p-ok').show();
+        return false;
+    })
+
+    $('.p-ok').live('click', function(){
+        el = $(this);
+        el.parent().parent().parent().find('.no_active').removeClass('no_active');
+        if (el.parent().find('input').is('[type=text]')) {
+            el.parent().find('a').text(el.parent().find('input').val());
+        }
+        el.parent().find('input').hide();
+        el.hide();
+    })
+
+    $('.p-submit a').live('click', function(){
+        el = $(this);
+        if (!el.parent().parent().is('.no_active')) {
+            $.ajax({
+                type:'post',
+                url:'/cabinet/',
+                data:{
+                    first_name:$('#first_name').val(),
+                    last_name:$('#last_name').val(),
+                    email:$('#email').val(),
+                    phone:$('#phone').val(),
+                    is_receive_mailer:$('#id-spam').prop("checked")
+                },
+                success:function(data) {
+                    if (data=='success') {
+                        el.parent().parent().addClass('no_active');
+                    } else if (data=='error') {
+                        alert('Ошибка передачи');
+                    }
+                }
+            })
+        }
+        return false;
+    })
+    $('.show-more a').live('click', function(){
+        el = $(this);
+        $.ajax({
+            type:'get',
+            url:window.location.href + el.attr('rel'),
+            success:function(data){
+                el.parent().parent().parent().parent().replaceWith(data);
+            },
+            error:function(data){
+                alert('Ошибка');
+            }
+        });
+        return false;
+    })
+
+    $('.item-img-fr').live('click', function(){
+        el = $(this);
+        $('.item-img-zl').html('<img src="'+el.attr('rel')+'" alt="" />');
+        $('.item-img-zs.current').removeClass('current');
+        el.parent().addClass('current');
         return false;
     })
 });

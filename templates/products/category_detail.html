@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% load thumbnail products_extras pagination_tags %}
+{% load thumbnail products_extras pagination_tags pytils_numeral  %}
 
 {% block title %}
     {{ category.title }} &mdash;
@@ -50,20 +50,22 @@
                         <div class="item-des">
                             <a href="{{ product.get_absolute_url }}" class="item-des-name">{{ product.title }}</a>
                         </div>
-                        <div class="item-price">{% if product.sale_value %}<span class="old-price">{{ product.get_str_price_old }} ₷</span> {% endif %}{{ product.get_str_price }} ₷</div>
+                        <div class="item-price">{% if product.sale_value %}<span class="old-price">{{ product.get_str_old_price }} ₷</span> {% endif %}{{ product.get_str_price }} ₷</div>
                         <a href="{{ product.get_absolute_url }}"></a>
 
                     </div>
                 {% endfor %}
-                <div class="show-more">
-                    <div class="btn-round">
-                        <div class="submit btn-lgrey small-font">
-                            <div>
-                                <a href="#">Показать еще 15 товаров</a>
+                {% if page_obj.has_next %}
+                    <div class="show-more">
+                        <div class="btn-round">
+                            <div class="submit btn-lgrey small-font">
+                                <div>
+                                    <a href="#" rel="?page={{ page_obj.next_page_number }}{{ getvars }}{{ hashtag }}">Показать еще {{ load_prod|get_plural:"товар,товара,товаров" }}</a>
+                                </div>
                             </div>
                         </div>
                     </div>
-                </div>
+                {% endif %}
             </div><!--/items-->
         </div><!--/center-->
 
