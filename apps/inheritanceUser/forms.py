@@ -83,7 +83,7 @@ class ProfileForm(forms.ModelForm):
 
     def save(self, commit=True):
         user = super(ProfileForm, self).save()
-        if user:
+        if user and not user.is_staff:
             user.username = user.email
             user.save()
 
