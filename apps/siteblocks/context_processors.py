@@ -31,6 +31,9 @@ def settings(request):
         prod_cnt = Settings.objects.get(name='prod_cnt').value
     except:
         prod_cnt = 15
+    # ручное создание сессии
+    if not request.session.exists(request.session.session_key):
+        request.session.create()
 
     return {
         'phonenum': phonenum,
