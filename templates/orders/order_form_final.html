@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 
 {% block title %}
-        &mdash;
+       Оформление заказа &mdash;
 {% endblock %}
 
 {% block main %}
@@ -15,23 +15,25 @@
         </div><!--/text-->
         {% if reg_form %}
             <form class="final_reg" method="post" action="/registration_form/">
-                <div style="display: none;">
-                    {{ reg_form.email }}
-                    {{ reg_form.username.errors }}
-                    {{ reg_form.email.errors }}
+                <div class="input">
+                    <label><span>E-mail:</span> {{ reg_form.email }}
+                        <div class="help-text">{{ reg_form.username.errors }}
+                            {{ reg_form.email.errors }}</div></label>
                 </div>
-                <div class="input input3">
-                    <label>Осталось только придумать пароль:</label>
-                    {{ reg_form.password1 }}
-                    {{ reg_form.password1.errors }}
+                <div class="input">
+                    <label><span>Осталось только придумать пароль:</span> {{ reg_form.password1 }}
+                        <div class="help-text">{{ reg_form.password1.errors }}</div></label>
                 </div>
-                <div class="input input3">
-                    <label>Повторение пароля:</label>
-                    {{ reg_form.password2 }}
-                    {{ reg_form.password2.errors }}
+                <div class="input">
+                    <label><span>Повторение пароля:</span> {{ reg_form.password2 }}
+                        <div class="help-text">{{ reg_form.password2.errors }}</div></label>
                 </div>
                 <input type="hidden" name="order_id" value="{{ order.id }}">
-                <div><input class="btn2 reg_submit" type="submit" value="Зарегистрироваться" /></div>
+                <div class="check-col-margin">
+                    <div class="submit btn-green">
+                        <div><input type="submit" value="Зарегистрироваться" /></div>
+                    </div>
+                </div>
             </form>
         {% endif %}
     </div><!--/order_final-->

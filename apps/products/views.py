@@ -9,6 +9,11 @@ from django.views.generic.simple import direct_to_template
 
 from django.views.generic import ListView, DetailView, DetailView
 
+try:
+    from apps.siteblocks.models import Settings
+    prod_cnt = int(Settings.objects.get(name='prod_cnt').value)
+except:
+    prod_cnt = 15
 
 from models import Category, Product
 
@@ -61,12 +66,19 @@ class CategoryDetail(DetailView):
                 category = False
 
         if category:
+            if 'page' in self.request.GET:
+                page = int(self.request.GET['page'])
+            else:
+                page = 1
             context['parent_category'] = category.get_root()
             context['category'] = category
-            products = category.get_products()[:6]
+            products = category.get_products()
             context['category_products'] = products
+            context['load_prod'] = category.get_products().count() - prod_cnt*page
         else:
             context['category'] = False
+        if self.request.is_ajax():
+            self.template_name = 'products/product_load.html'
         return context
 category_detail = CategoryDetail.as_view()
 
@@ -76,6 +88,17 @@ class NewList(ListView):
     template_name = 'products/new_list.html'
     queryset = Product.objects.filter(is_published=True, is_new=True)
 
+    def get_context_data(self, **kwargs):
+        context = super(NewList, self).get_context_data(**kwargs)
+        if 'page' in self.request.GET:
+            page = int(self.request.GET['page'])
+        else:
+            page = 1
+        context['load_prod'] = self.queryset.count() - prod_cnt*page
+        if self.request.is_ajax():
+            self.template_name = 'products/product_load.html'
+        return context
+
 new_list = NewList.as_view()
 
 class SaleList(ListView):
@@ -83,5 +106,16 @@ class SaleList(ListView):
     context_object_name = 'sale_products'
     template_name = 'products/sale_list.html'
     queryset = Product.objects.filter(is_published=True).exclude(sale_value=u'')
+
+    def get_context_data(self, **kwargs):
+        context = super(SaleList, self).get_context_data(**kwargs)
+        if 'page' in self.request.GET:
+            page = int(self.request.GET['page'])
+        else:
+            page = 1
+        context['load_prod'] = self.queryset.count() - prod_cnt*page
+        if self.request.is_ajax():
+            self.template_name = 'products/product_load.html'
+        return context
 
 sale_list = SaleList.as_view()

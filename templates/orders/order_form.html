@@ -7,69 +7,141 @@
 {% endblock %}
 
 {% block main %}
+    <h1>Оформление заказа</h1>
     <form class="order_form" method="post" action="/cart/order_form_step2/">
+        {% csrf_token %}<div class="check">
+            <div class="check-step">
+                {{ order_form.non_field_errors }}
+                <h1><span class="check-num">1</span> Контактная информация {% if not user.is_authenticated %}<span class="ifregistred ckeck-login">Есть логин на нашем сайте? <a href="#auth_form" class="auth_lnk">Войти</a></span>{% endif %}</h1>
+                <div class="input check-col check-radio">
+                    <label><span>Имя</span> {{ order_form.first_name }}
+                        {{ order_form.first_name.errors }}</label>
+                </div>
+                <div class="input check-col check-radio">
+                    <label><span>Фамилия</span> {{ order_form.last_name }}
+                        {{ order_form.last_name.errors }}</label>
+                </div>
+                <div class="input check-col check-radio">
+                    <label><span>E-mail <i>вышлем информацию</i></span>
+                        {{ order_form.email }}
+                        {{ order_form.email.errors }}</label>
+                </div>
+                <div class="input check-col check-radio">
+                    <label><span>Телефон <i>подтвердим заказ</i></span> {{ order_form.phone }}
+                        {{ order_form.phone.errors }}</label>
+                </div>
+            </div><!--check-step-->
+            <div class="check-step">
+                <h1><span class="check-num">2</span> Получение заказа</h1>
+                <div class="check-posts">
+                    <span class="check-post{% if order_form.order_carting.value == 'carting' %} current{% else %}{% if not order_form.order_carting.value %} current{% endif %}{% endif %}" data-num="carting">
+                        <a href="#">Курьер</a>
+                        <span>по Санкт-Петербургу</span>
+                    </span>
+                    <span class="check-post{% if order_form.order_carting.value == 'country' %} current{% endif %}" data-num="country">
+                        <a href="#">EMS Почта России</a>
+                        <span>по России</span>
+                    </span>
+                    <span class="check-post{% if order_form.order_carting.value == 'selfcarting' %} current{% endif %}" data-num="selfcarting">
+                        <a href="#">Самовывоз</a>
+                        <span>в Санкт-Петербурге</span>
+                    </span>
+                    <input type="hidden" name="order_carting" value="{% if order_form.order_carting.value %}{{ order_form.order_carting.value }}{% else %}carting{% endif %}">
+                </div>
+                <div class="check-col col_selfcarting{% if order_form.order_carting.value == 'selfcarting' %} current{% endif %}">
+                    <div class="map">
 
-        <div style="display: block;"> <!-- none; -->
-            {{ order_form.profile }}
-            {{ order_form.profile.errors }}
-            {{ order_form.order_carting }}
-            {{ order_form.order_payment }}
-            {{ order_form.order_payment.errors }}
-            {{ order_form.order_carting.errors }}
-            {{ order_form.city }}
-            {{ order_form.city.errors }}
-        </div>
-
-        {% if not user.is_authenticated %}<span class="ifregistred">Есть логин на нашем сайте? <a href="#auth_form" class="fancybox">Войти</a></span>{% endif %}
-
-        {{ order_form.first_name }}
-        {{ order_form.first_name.errors }}
-        {{ order_form.last_name }}
-        {{ order_form.last_name.errors }}
-        {{ order_form.email }}
-        {{ order_form.email.errors }}
-        {{ order_form.phone }}
-        {{ order_form.phone.errors }}
-
-        <!-- для выставления курента для способа доставки -->
-        {{ order_form.order_carting.value }}
-        <!-- для выставления галки на способ оплаты -->
-        {{ order_form.order_payment.value }}
-
-        <!--текст для блока Курьер -->
-        {{ express_text|safe }}
-        <!--текст для блока самовывоза -->
-        {{ selfcarting_text|safe }}
-
-        {{ order_form.index }}
-        {{ order_form.index.errors }}
-        {{ order_form.street }}
-        {{ order_form.street.errors }}
-        {{ order_form.house_no }}
-        {{ order_form.house_no.errors }}
-        {{ order_form.apartment }}
-        {{ order_form.apartment.errors }}
-        {{ order_form.note }}
-        {{ order_form.note.errors }}
-
-        {{ order_form.non_field_errors }}
-
-        <!--  это поле (delivery_price) нужно чтобы в него вносить стоимость доставки (чтобы потом добавить к стоимости заказа)
-         Если по емс - то в зависимости от выбранного города внести значение
-         Если самовывоз - то 0
-         Если курьер - то значение из настройки express_price -->
-        <input type="text" name="delivery_price" value="">
-        {{ express_price }}
-
-
-        <!--  на change для этого селекта будет вычисления EmsPrice после вычисления значение будет выводиться
-        пользователю и заполняться в инпут delivery_price (EmsPrice функция в script.js, я её просто скопировал) -->
-        <select name="ems_city">
-            {% for ems_city in ems_cities %}
-                <option value="{{ ems_city.value }}">{{ ems_city.name }}</option>
-            {% endfor %}
-        </select>
-
-        <input type="submit" name="cart_submit" value="Отправить заказ" />
+                    </div>
+                </div>
+                <div class="check-col col_selfcarting{% if order_form.order_carting.value == 'selfcarting' %} current{% endif %}">
+                    {{ selfcarting_text|safe }}
+                </div>
+                <div class="check-col col_carting{% if order_form.order_carting.value == 'carting' %} current{% else %}{% if not order_form.order_carting.value %} current{% endif %}{% endif %}">
+                    <div class="input">
+                        <label><span>Стоимость доставки</span>
+                            <input type="text" name="delivery_price" value="{{ express_price }}" disabled>
+                        </label>
+                    </div>
+                </div>
+                <div class="check-col col_country{% if order_form.order_carting.value == 'country' %} current{% endif %}">
+                    <div class="sels">
+                        <label><span>Город</span></label>
+                        <select name="city">
+                            {% for ems_city in ems_cities %}
+                                <option value="{{ ems_city.value }}"{% if order_form.city.value == ems_city.value %} selected {% endif %}>{{ ems_city.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="input">
+                        <label><span>Стоимость доставки</span>
+                            <input type="text" name="delivery_price" value="" disabled style="display: none">
+                            <b>Для расчета стоимости необходимо выбрать город</b>
+                        </label>
+                    </div>
+                </div>
+                <div class="check-col col_country col_carting{% if order_form.order_carting.value == 'carting' or order_form.order_carting.value == 'country' %} current{% else %}{% if not order_form.order_carting.value %} current{% endif %}{% endif %}">
+                    <div class="input">
+                        <label><span>Индекс</span> {{ order_form.index }}
+                            {{ order_form.index.errors }}</label>
+                    </div>
+                    <div class="input">
+                        <label><span>Улица</span> {{ order_form.street }}
+                            {{ order_form.street.errors }}</label>
+                    </div>
+                    <div class="input input-zs">
+                        <label><span>Дом</span> {{ order_form.house_no }}
+                            {{ order_form.house_no.errors }}</label>
+                    </div>
+                    <div class="input input-zs input-nomarg">
+                        <label><span>Квартира</span> {{ order_form.apartment }}
+                            {{ order_form.apartment.errors }}</label>
+                    </div>
+                    <div class="textarea nobold">
+                        <label>
+                            <span>Примечание</span>
+                            {{ order_form.note }}
+                            {{ order_form.note.errors }}
+                        </label>
+                    </div>
+                </div>
+            </div><!--check-step-->
+            <div class="check-step">
+                <h1><span class="check-num">3</span> Оплата заказа</h1>
+                <div class="check-col check-radio">
+                    <div class="pay">
+                        <p>Выбирете удобный способ оплаты</p>
+                        <div class="radio only_carting">
+                            <label>
+                                <input type="radio" name="order_payment" value="cash" {% if order_form.order_payment.value == 'cash' %}checked="on"{% endif %} />
+                                <span>Наличными курьеру при получении заказа</span>
+                            </label>
+                            <div class="radio_overlay" style="{% if order_form.order_carting.value != 'carting' %}display:block{% endif %}"></div>
+                        </div>
+                        <div class="radio">
+                            <label>
+                                <input type="radio" name="order_payment" value="cash_on_delivery" {% if order_form.order_payment.value == 'cash_on_delivery' %}checked="on"{% endif %} />
+                                <span>Наложенным платежом</span>
+                            </label>
+                        </div>
+                        <div class="radio">
+                            <label>
+                                <input type="radio" name="order_payment" value="bank_card" {% if order_form.order_payment.value == 'bank_card' %}checked="on"{% endif %} />
+                                <span>Банковской картой Visa или MasterCard</span>
+                            </label>
+                        </div>
+                        {{ order_form.order_payment.errors }}
+                    </div>
+                </div>
+                <div class="check-col check-radio">
+                    <div class="check-col-margin">
+                        <div class="submit btn-green">
+                            <div>
+                                <a href="#" id="order_form_submit">Оплатить заказ <span class="left-arr"></span></a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div><!--check-step-->
+        </div><!--/check-->
     </form>
 {% endblock %}

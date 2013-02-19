@@ -1,18 +1,25 @@
-<a href="{% url sale_list %}">Sale</a>
-<a href="{% url new_list %}">New</a>
-<ul>
-    {% for item in menu %}
-        <li {% if item.slug == current_category %}class="current"{% endif %}>
-            <a href="{{ item.get_absolute_url }}">{{ item.title }}</a>
-            {% if item.get_children %}
-                <ul>
-                {% for child in item.get_children %}
-                    <li>
-                        &mdash; <a href="{{ child.get_absolute_url }}">{{ child.title }}</a>
-                    </li>
-                {% endfor %}
-                </ul>
-            {% endif %}
-        </li>
-    {% endfor %}
-</ul>
+<div class="left">
+    <div class="menu">
+        <a href="{% url sale_list %}" class="menu-sale"><span>Sale</span></a>
+        <a href="{% url new_list %}" class="menu-new"><span>New</span></a>
+        <ul>
+            {% for item in menu %}
+                <li {% if item.slug == current_category %}class="current"{% endif %}>
+                    <div class="konfets"></div>
+                    <div class="submenu">
+                        {% if item.get_children %}
+                            <ul>
+                                {% for child in item.get_children %}
+                                    <li>
+                                        <a href="{{ child.get_absolute_url }}">{{ child.title }}</a>
+                                    </li>
+                                {% endfor %}
+                            </ul>
+                        {% endif %}
+                    </div>
+                    <span class="menu-under"></span><a href="{{ item.get_absolute_url }}"><span class="menu-img"><img src="/media/img/menu_home.png" alt="{{ item.title }}" /></span> {{ item.title }}</a>
+                </li>
+            {% endfor %}
+        </ul>
+    </div><!--/menu-->
+</div><!--/left-->

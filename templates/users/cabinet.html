@@ -9,11 +9,97 @@
 {% block main %}
     {% block_category_menu request.path %}
 
-    {{ user.email }}
-    {{ user.last_name }}
-    {{ user.first_name }}
-    {{ user.phone }}
-    {{ user.is_receive_mailer }}
+    <div class="center">
+        <div class="personal-left">
+            <h1>Личный кабинет</h1>
+            <div class="personal-info">
+                <div class="personal-info-top"></div>
+                <div class="p-spam">
+                    <input type="checkbox" id="id-spam" {% if user.is_receive_mailer %}checked{% endif %} name="spam"/>
+                    <span>получать рассылку на этот e-mail</span>
+                </div>
+                <div class="p-input">
+                    <div class="p-label">e-mail</div>
+                    <div class="p-val"><a href="#">{% if user.email %}{{ user.email }}{% else %}Указать{% endif %}</a></div>
+                    <input type="text" name="email" value="{{ user.email }}" id="email"/>
+                    <span class="p-ok"></span>
+                </div>
+                <div class="p-input">
+                    <div class="p-label">фамилия</div>
+                    <div class="p-val"><a href="#">{% if user.last_name %}{{ user.last_name }}{% else %}Указать{% endif %}</a></div>
+                    <input type="text" name="last_name" value="{{ user.last_name }}"  id="last_name"/>
+                    <span class="p-ok"></span>
+                </div>
+                <div class="p-input">
+                    <div class="p-label">имя</div>
+                    <div class="p-val"><a href="#">{% if user.first_name %}{{ user.first_name }}{% else %}Указать{% endif %}</a></div>
+                    <input type="text" name="first_name" value="{{ user.first_name }}" id="first_name"/>
+                    <span class="p-ok"></span>
+                </div>
+                <div class="p-input">
+                    <div class="p-label">телефон</div>
+                    <div class="p-val"><a href="#">{% if user.phone %}{{ user.phone }}{% else %}Указать{% endif %}</a></div>
+                    <input type="text" name="phone" value="{{ user.phone }}"  id="phone"/>
+                    <span class="p-ok"></span>
+                </div>
+                <div class="p-input">
+                    <div class="p-label">пароль</div>
+                    <div class="p-val"><a href="#"><em>*********</em></a></div>
+                    <input type="password"  id="password"/>
+                    <span class="p-ok"></span>
+                </div>
+                <div class="p-submit">
+                    <div class="submit btn-green no_active">
+                        <div>
+                            <a href="#">Применить</a>
+                        </div>
+                    </div>
+                </div>
+            </div><!--/personal-info-->
+        </div><!--/personal-left-->
+        <div class="personal-right">
+            <div class="discount">
+                <p>У вас есть наша дисконтная карта?</p>
+                <div class="discount-btns">
+                    <div class="submit btn-green">
+                        <div>
+                            <a href="#">Да</a>
+                        </div>
+                    </div>
+                    <div class="submit btn-grey">
+                        <div>
+                            <a href="#">Нет</a>
+                        </div>
+                    </div>
+                </div>
+            </div><!--/discount-->
+        </div><!--/personal-right-->
+        <h1>История заказов</h1>
+        <div class="p-orders">
+            <!-- история заказов -->
+            {% for order in orders %}
+                <div class="p-order">
+                    <div class="p-order-info">
+                        <div class="p-order-num">Заказ № {{ order.id }} <div>от {{ order.create_date|date:"d E" }}</div></div>
+                        <div class="p-order-sum"><div>на сумму</div>{{ order.get_str_total }} ₷</div>
+                    </div>
+                    <div class="p-order-items">
+                        {% for product in order.get_products %}
+                            <div class="p-order-item">
+                                <div class="p-order-cat">{{ product.product.category.title }}</div>
+                                <div class="p-order-name"><a href="{{ product.product.get_absolute_url }}">{{ product.product.title }}</a></div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                    <div class="p-order-status">
+                        <div class="p-order-status-in{% if order.order_status == "delivered" %} stat-ok{% else %} stat-new{% endif %}">{{ order.get_order_status_display }}</div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div><!--/p-orders-->
+    </div><!--/center-->
+
+
 
     <!-- для редактирования данных пользователя отправляй аяком на /cabinet/ POST такие переменные
         first_name
@@ -27,16 +113,6 @@
          возврат error - были ошибки
     -->
 
-    <!-- история заказов -->
-    {% for order in orders %}
-        <div>
-            {{ order.id }}
-            {{ order.create_date }}
-            {{ order.get_str_total }}
-            {{ order.order_status }}
-            {{ order.get_products }}
-        </div>
-    {% endfor %}
 
 
 {% endblock %}

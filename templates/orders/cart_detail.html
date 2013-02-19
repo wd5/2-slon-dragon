@@ -7,7 +7,90 @@
 {% endblock %}
 
 {% block main %}
-    Корзина
+    <div class="center">
+        <div class="cart">
+            {% if cart_is_empty %}
+                <h1>Ваша корзина пока пуста</h1>
+            {% else %}
+                <h1>Корзина</h1>
+                {% for cart_product in cart_products %}
+                    {% if not cart_product.is_deleted %}
+                        <div class="cart-item">
+                            <div class="cart-img"><a href="#">
+                                {% thumbnail cart_product.product.image "160x160" as img %}
+                                    <img src="{{ img.url }}" alt="" />
+                                {% endthumbnail %}
+                            </a></div>
+                            <div class="cart-name"><a href="{{ cart_product.product.get_absolute_url }}">{{ cart_product.product.title }}</a></div>
+                            <div class="cart-cost">
+                                <span class="cart-price">{{ cart_product.product.get_str_price }} ₷ ×</span>
+                                <div class="btn-round">
+                                    <div class="submit btn-lgrey small-font">
+                                        <div>
+                                            <a href="#" data-num="{{ cart_product.id }}">{{ cart_product.count }}</a>
+                                        </div>
+                                    </div>
+                                </div>
+                                <span class="cart-total">{{ cart_product.get_str_total }} ₷</span>
+                            </div>
+                            <div class="cart-del">
+                                <a href="#" class="cart-del-lnk" data-num="{{ cart_product.id }}"></a>
+                            </div>
+                            <div class="cart_overlay">
+                                <div class="submit btn-green">
+                                    <div><a href="#" data-num="{{ cart_product.id }}">Вернуть</a></div>
+                                </div>
+                            </div>
+                        </div>
+                    {% endif %}
+                {% endfor %}
+                <div class="cart_change_cnt">
+                    <div class="price_cnt">450 ₷ ×</div>
+                    <div class="input">
+                        <span class="min_cnt"></span>
+                        <input type="text">
+                        <span class="add_cnt"></span>
+                    </div>
+                    <div class="total_cnt">900 ₷</div>
+                    <div class="cnt_actions">
+                        <div class="submit btn-grey">
+                            <div><a href="#" class="cnt_cancel">Отменить</a></div>
+                        </div>
+                        <div class="submit btn-green">
+                            <div><a href="#" class="cnt_save">Сохранить</a></div>
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
+        </div><!--/cart-->
+    </div><!--/center-->
+    <div class="right">
+        <div class="discount">
+            <p>У вас есть наша дисконтная карта?</p>
+            <div class="discount-btns">
+                <div class="submit btn-green">
+                    <div>
+                        <a href="#">Да</a>
+                    </div>
+                </div>
+                <div class="submit btn-grey">
+                    <div>
+                        <a href="#">Нет</a>
+                    </div>
+                </div>
+            </div>
+        </div><!--/discount-->
+        <div class="tocheck">
+            <div class="label">Общая стоимость</div>
+            <div class="tocheck-cost">{{ cart_str_total }} ₷</div>
+            <div></div>
+            <div class="submit btn-green">
+                <div>
+                    <a href="/cart/show_order_form/">Оформить заказ <span class="left-arr"></span></a>
+                </div>
+            </div>
+        </div><!--/tocheck-->
+    </div><!--/right-->
 
     <!-- для удаления товара, аяком POST на  /cart/delete_product_from_cart/ шлешь переменную
      cart_product_id - айдишник CartProduct - продукта в корзине
@@ -23,23 +106,6 @@
         в ответ success - значит всё норм
 
       -->
-
-    <div>
-        {{ cart_is_empty }}
-        {{ cart_id }}
-        {{ cart_str_total }}
-        <div>
-            {% for cart_product in cart_products %}
-                {{ cart_product.product.title }}
-                {{ cart_product.product.get_str_price }}
-                {{ cart_product.product.price }}
-                {{ cart_product.count }}
-                {{ cart_product.get_str_total }}
-            {% endfor %}
-        </div>
-    </div>
-
-    <a href="/cart/show_order_form/">Оформить заказ</a>
 
 {% endblock %}
 

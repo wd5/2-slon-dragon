@@ -7,29 +7,64 @@
 {% endblock %}
 
 {% block main %}
+
     {% block_category_menu request.path %}
 
-    <!-- СЛОН-ДРАКОН РЕКОМЕНДУЕТ -->
-    {% for product in recomended_products %}
-    <div>
-        <a href="{{ product.get_absolute_url }}">{{ product.title }}</a>
-        {{ product.get_str_price }}
-        {{ product.image }}
-        {{ product.is_new }}
-        {{ product.sale_value }}
-    </div>
-    {% endfor %}
+    <div class="center">
+        <h1>Слон-дракон рекомендует</h1>
+        <div class="items">
+            <!-- СЛОН-ДРАКОН РЕКОМЕНДУЕТ -->
+            {% for product in recomended_products %}
+                <div class="item">
+                    {% if product.is_new %}
+                        <div class="item-new">NEW</div>
+                    {% endif %}
+                    {% if product.sale_value %}
+                        <div class="item-sale">{{ product.sale_value }} <span>скидка</span></div>
+                    {% endif %}
+                    <div class="item-img">
+                        <a href="{{ product.get_absolute_url }}">
+                            {% thumbnail product.image "160x160" as img %}
+                                <img src="{{ img.url }}" alt="" />
+                            {% endthumbnail %}
+                        </a>
+                    </div>
+                    <div class="item-des">
+                        <a href="{{ product.get_absolute_url }}" class="item-des-name">{{ product.title }}</a>
+                    </div>
+                    <div class="item-price">{{ product.get_str_price }} ₷</div>
+                    <a href="{{ product.get_absolute_url }}"></a>
 
-    <!-- НЕДАВНО КУПИЛИ -->
-    {% for product in recently_buyed_products %}
-    <div>
-        <a href="{{ product.get_absolute_url }}">{{ product.title }}</a>
-        {{ product.get_str_price }}
-        {{ product.image }}
-        {{ product.is_new }}
-        {{ product.sale_value }}
-    </div>
-    {% endfor %}
+                </div>
+            {% endfor %}
+        </div><!--/items-->
+        <h1>Недавно купили</h1>
+        <div class="items-slider">
+            <ul>
+                <!-- НЕДАВНО КУПИЛИ -->
+                {% for product in recently_buyed_products %}
+                    <li>
+                        <div class="item">
+                            <div class="item-img">
+                                <a href="{{ product.get_absolute_url }}">
+                                    {% thumbnail product.image "160x160" as img %}
+                                        <img src="{{ img.url }}" alt="" />
+                                    {% endthumbnail %}
+                                </a>
+                            </div>
+                            <div class="item-des">
+                                <a href="{{ product.get_absolute_url }}" class="item-des-name">{{ product.title }}</a>
+                            </div>
+                            <div class="item-price">{{ product.get_str_price }} ₷</div>
+                            <a href="{{ product.get_absolute_url }}"></a>
+                        </div>
+                    </li>
+                {% endfor %}
+            </ul>
+            <div class="slider-left"></div>
+            <div class="slider-right"></div>
+        </div><!--/items-slider-->
+    </div><!--/center-->
 
 {% endblock %}
 

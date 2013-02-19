@@ -1,8 +1,27 @@
-{% for slide in slider_items %}
-    <div class="slide">
-        {{ slide.title_addition }}
-        {{ slide.url }}
-        {{ slide.title }}
-        <img src="{{ slide.get_image }}" alt="" />
-    </div>
-{% endfor %}
+<div class="slider">
+    <ul>
+    {#    <div class="slide">#}
+{#        #}
+{#        #}
+{#        #}
+{#        <img src="" alt="" />#}
+{#    </div>#}
+        {% for slide in slider_items %}
+            <li>
+                <img src="{{ slide.get_image }}" alt="" />
+                <div class="slider-text">
+                    <span>{{ slide.title_addition }}</span>
+                    <div><h1><a href="{{ slide.url }}">{{ slide.title }}</a></h1></div>
+                </div>
+            </li>
+        {% endfor %}
+    </ul>
+    <div class="slider-left"></div>
+    <div class="slider-right"></div>
+    <div class="slider-ctrls">
+        {% for slide in slider_items %}
+            <span class="ctrl{% if forloop.first %} current{% endif %}"></span>
+        {% endfor %}
+    </div><!--/slider-ctrls-->
+</div><!--/slider-->
+

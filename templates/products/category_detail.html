@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% load thumbnail products_extras %}
+{% load thumbnail products_extras pagination_tags pytils_numeral  %}
 
 {% block title %}
     {{ category.title }} &mdash;
@@ -11,22 +11,63 @@
 
     {% if category %}
 
-        {{ parent_category }}
-        {{ parent_category.get_absolute_url }}<br/>
 
-        {% if category != parent_category %}
-            {{ category.title|upper }}
-        {% endif %}
+        <div class="center">
+            {% if parent_category %}
+                <div class="bread"><a href="{{ parent_category.get_absolute_url }}" class="bread-lnk">{{ parent_category }}</a> / </div>
+            {% endif %}
+        {# TODO: слайдер цены #}
 
-        {% for product in category_products %}
-        <div>
-            <a href="{{ product.get_absolute_url }}">{{ product.title }}</a>
-            {{ product.get_str_price }}
-            {{ product.image }}
-            {{ product.is_new }}
-            {{ product.sale_value }}
-        </div>
-        {% endfor %}
+            {% if category != parent_category %}
+                <div class="cats">
+                    <div class="dropdown">
+                        <ul>
+                            {% for cat in parent_category.get_children %}
+                                <li><a href="{{ cat.get_absolute_url }}">{{ cat.title }}</a></li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                    <div class="cats-curr">{{ category.title|upper }} <i></i></div>
+                </div>
+            {% endif %}
+            <div class="items">
+                {% autopaginate category_products prod_cnt %}
+                {% for product in category_products %}
+                    <div class="item">
+                        {% if product.is_new %}
+                            <div class="item-new">NEW</div>
+                        {% endif %}
+                        {% if product.sale_value %}
+                            <div class="item-sale">{{ product.sale_value }} <span>скидка</span></div>
+                        {% endif %}
+                        <div class="item-img">
+                            <a href="{{ product.get_absolute_url }}">
+                                {% thumbnail product.image "160x160" as img %}
+                                    <img src="{{ img.url }}" alt="" />
+                                {% endthumbnail %}
+                            </a>
+                        </div>
+                        <div class="item-des">
+                            <a href="{{ product.get_absolute_url }}" class="item-des-name">{{ product.title }}</a>
+                        </div>
+                        <div class="item-price">{% if product.sale_value %}<span class="old-price">{{ product.get_str_old_price }} ₷</span> {% endif %}{{ product.get_str_price }} ₷</div>
+                        <a href="{{ product.get_absolute_url }}"></a>
+
+                    </div>
+                {% endfor %}
+                {% if page_obj.has_next %}
+                    <div class="show-more">
+                        <div class="btn-round">
+                            <div class="submit btn-lgrey small-font">
+                                <div>
+                                    <a href="#" rel="?page={{ page_obj.next_page_number }}{{ getvars }}{{ hashtag }}">Показать еще {{ load_prod|get_plural:"товар,товара,товаров" }}</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% endif %}
+            </div><!--/items-->
+        </div><!--/center-->
 
     {% endif %}
 
